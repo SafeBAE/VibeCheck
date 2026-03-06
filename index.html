@@ -893,7 +893,14 @@
       50%  { background-position: 0% 0; opacity: .7; }
       100% { background-position: 200% 0; opacity: .35; }
     }
-    .topActions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .topbarRow{ display:flex; align-items:center; justify-content:space-between; width:100%; gap:12px; }
+    .btnQuickExitMobile{ display:none; }
+    .btnQuickExitDesktop{ display:inline-flex; }
+    @media(max-width:600px){
+      .btnQuickExitMobile{ display:inline-flex; }
+      .btnQuickExitDesktop{ display:none !important; }
+    }
+    .topActions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; width:100%; }
     .btn{
       appearance:none; border:none;
       padding: 12px 14px;
@@ -5749,33 +5756,36 @@ details.expando summary:hover {
   <div id="srAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
   <div class="app">
     <div class="topbar" role="banner">
-      <div class="brand">
-        <div class="logo">
-          <svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
-            <!-- Stem -->
-            <line x1="50" y1="64" x2="50" y2="130" stroke="#15FFC8" stroke-width="6" stroke-linecap="round" />
-            <!-- Center -->
-            <circle cx="50" cy="50" r="14" fill="#15FFC8" />
-            <!-- Petals -->
-            <g fill="#D1FEFF">
-              <ellipse cx="50" cy="20" rx="10" ry="18"/>
-              <ellipse cx="50" cy="80" rx="10" ry="18"/>
-              <ellipse cx="20" cy="50" rx="18" ry="10"/>
-              <ellipse cx="80" cy="50" rx="18" ry="10"/>
-              <ellipse cx="30" cy="30" rx="12" ry="18" transform="rotate(-45 30 30)"/>
-              <ellipse cx="70" cy="30" rx="12" ry="18" transform="rotate(45 70 30)"/>
-              <ellipse cx="30" cy="70" rx="12" ry="18" transform="rotate(45 30 70)"/>
-              <ellipse cx="70" cy="70" rx="12" ry="18" transform="rotate(-45 70 70)"/>
-            </g>
-          </svg>
+      <div class="topbarRow">
+        <div class="brand">
+          <div class="logo">
+            <svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+              <!-- Stem -->
+              <line x1="50" y1="64" x2="50" y2="130" stroke="#15FFC8" stroke-width="6" stroke-linecap="round" />
+              <!-- Center -->
+              <circle cx="50" cy="50" r="14" fill="#15FFC8" />
+              <!-- Petals -->
+              <g fill="#D1FEFF">
+                <ellipse cx="50" cy="20" rx="10" ry="18"/>
+                <ellipse cx="50" cy="80" rx="10" ry="18"/>
+                <ellipse cx="20" cy="50" rx="18" ry="10"/>
+                <ellipse cx="80" cy="50" rx="18" ry="10"/>
+                <ellipse cx="30" cy="30" rx="12" ry="18" transform="rotate(-45 30 30)"/>
+                <ellipse cx="70" cy="30" rx="12" ry="18" transform="rotate(45 70 30)"/>
+                <ellipse cx="30" cy="70" rx="12" ry="18" transform="rotate(45 30 70)"/>
+                <ellipse cx="70" cy="70" rx="12" ry="18" transform="rotate(-45 70 70)"/>
+              </g>
+            </svg>
+          </div>
+          <div class="brandText">
+            <div class="title">Vibe Check <span class="brandBy">by SafeBAE</span></div>
+            <div class="brandSub">Reflection &amp; Accountability</div>
+          </div>
         </div>
-        <div class="brandText">
-          <div class="title">Vibe Check <span class="brandBy">by SafeBAE</span></div>
-          <div class="brandSub">Reflection &amp; Accountability</div>
-        </div>
+        <button class="btn btnSmall btnQuickExit btnQuickExitMobile" data-action="quickExit" title="Leave this page immediately"><i class="ph-bold ph-sign-out"></i> Quick Exit</button>
       </div>
       <div class="topActions">
-        <button class="btn btnSmall btnQuickExit" data-action="quickExit" title="Leave this page immediately"><i class="ph-bold ph-sign-out"></i> Quick Exit</button>
+        <button class="btn btnSmall btnQuickExit btnQuickExitDesktop" data-action="quickExit" title="Leave this page immediately"><i class="ph-bold ph-sign-out"></i> Quick Exit</button>
         <button class="btn btnSmall btnResources" data-action="needResources" title="Skip to resources &amp; next steps"><i class="ph-bold ph-list-bullets"></i> Resources</button>
         <button class="btn btnSmall btnCrisis" id="btnCrisis" onclick="toggleCrisisBanner()" title="Show crisis resources"><i class="ph-bold ph-first-aid"></i> In crisis?</button>
         <button class="btn btnSmall btnQuiet" data-action="restart"><i class="ph-bold ph-arrow-counter-clockwise"></i> Restart</button>
@@ -10087,10 +10097,10 @@ function render(){
         </div>
       </div>
     `;
-    actions.fp_physical = ()=>go("fp_talk_to_friend");
-    actions.fp_pressure = ()=>go("fp_talk_to_friend");
+    actions.fp_physical = ()=>go("fp_physical_harm");
+    actions.fp_pressure = ()=>go("fp_pressure_harm");
     actions.fp_digital = ()=>go("fp_digital_harm");
-    actions.fp_power = ()=>go("fp_talk_to_friend");
+    actions.fp_power = ()=>go("fp_power_harm");
     actions.fp_not_sure_type = ()=>go("fp_trust_instinct");
     return;
   }
@@ -10109,6 +10119,90 @@ function render(){
           <button class="btn btnPrimary" data-action="fp_talk_to_friend">How do I talk to my friend about what I noticed?</button>
           <button class="btn" data-action="fp_support_affected">How do I check in with the person who may have been affected?</button>
           <button class="btn" data-action="nextSteps">Go to next steps</button>
+        </div>
+      </div>
+    `;
+    actions.fp_talk_to_friend = ()=>go("fp_talk_to_friend");
+    actions.fp_support_affected = ()=>go("fp_support_affected");
+    actions.nextSteps = ()=>go("nextSteps");
+    return;
+  }
+
+  if(id==="fp_physical_harm"){
+    screen.innerHTML = backBtn() + `
+      <div class="card">
+        <div class="h1"><i class="ph-bold ph-stop-circle" aria-hidden="true"></i> Let's name what this is.</div>
+        <div class="p">If your friend was involved in sexual contact that wasn't consensual — that's sexual assault. You don't need to soften it or find a gentler word. Calling it what it is isn't a betrayal of your friend. It's the beginning of taking it seriously.</div>
+        <div class="fpBoundaryBox">
+          <h4>What you might be feeling right now:</h4>
+          Learning this about someone you care about can feel like the ground shifting. You might feel shock, disbelief, anger, confusion, guilt for not seeing it sooner, or grief for the friendship as you knew it. All of that is real and valid. You don't have to have it figured out to move forward.
+        </div>
+        <div class="fpSignalList">
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-eye" aria-hidden="true"></i></span><span>You may want to minimise what happened to protect your friendship or because it doesn't match who you thought your friend was. That instinct is human — but don't let it override what you know.</span></div>
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-hand-palm" aria-hidden="true"></i></span><span>You're not the judge, the jury, or the fixer. But you are someone who knows — and that means you have a role. Staying silent sends a message too.</span></div>
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-user-circle" aria-hidden="true"></i></span><span>This is too big to carry alone. Talk to a trusted adult — a parent, school counsellor, coach, or mentor. Not to get your friend in trouble, but because you need support too, and because the affected person may need help you can't provide on your own.</span></div>
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-lifebuoy" aria-hidden="true"></i></span><span>If you're not sure who to talk to, a crisis line can help you think it through. RAINN (1-800-656-4673) supports both survivors and the people around them — including you.</span></div>
+        </div>
+        <div class="grid" style="margin-top:16px;">
+          <button class="btn btnPrimary" data-action="fp_talk_to_friend">How do I talk to my friend about this?</button>
+          <button class="btn" data-action="fp_support_affected">Supporting the person who was affected</button>
+          <button class="btn" data-action="nextSteps">Go to next steps & resources</button>
+        </div>
+      </div>
+    `;
+    actions.fp_talk_to_friend = ()=>go("fp_talk_to_friend");
+    actions.fp_support_affected = ()=>go("fp_support_affected");
+    actions.nextSteps = ()=>go("nextSteps");
+    return;
+  }
+
+  if(id==="fp_pressure_harm"){
+    screen.innerHTML = backBtn() + `
+      <div class="card">
+        <div class="h1"><i class="ph-bold ph-arrow-down" aria-hidden="true"></i> Pressure removes real choice — even without force.</div>
+        <div class="p">Coercion doesn't always look dramatic. It can be persistent asking, guilt trips, wearing someone down, or making them feel like saying no isn't an option. The absence of a "no" is not the same as a "yes."</div>
+        <div class="fpBoundaryBox">
+          <h4>Why this is hard to see clearly:</h4>
+          Your friend may genuinely believe nothing was wrong — because the other person "went along with it" or "didn't say stop." That's one of the things that makes pressure and coercion so complicated: the person doing it often doesn't recognise it as harm. But consent that comes from exhaustion, guilt, or fear isn't consent.
+        </div>
+        <div class="fpSignalList">
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-repeat" aria-hidden="true"></i></span><span>Coercion is often a pattern, not a one-time event. If your friend pressured someone once, consider whether this is how they typically operate — not stopping when someone hesitates, pushing past boundaries, treating "maybe" as "yes."</span></div>
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-chat-circle-dots" aria-hidden="true"></i></span><span>The affected person may not use the word "assault" or "abuse" — and that's okay. They may say it felt "weird," "uncomfortable," or "like they couldn't say no." Those words matter just as much.</span></div>
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-lightbulb" aria-hidden="true"></i></span><span>Your friend needs to understand the difference between getting a "yes" and getting enthusiastic, freely-given consent. That distinction is the whole conversation.</span></div>
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-hand-palm" aria-hidden="true"></i></span><span>Don't let your friend reframe it as a misunderstanding if the other person felt pressured. Impact matters more than intent.</span></div>
+        </div>
+        <div class="grid" style="margin-top:16px;">
+          <button class="btn btnPrimary" data-action="fp_talk_to_friend">How do I talk to my friend about this?</button>
+          <button class="btn" data-action="fp_support_affected">Supporting the person who was affected</button>
+          <button class="btn" data-action="nextSteps">Go to next steps & resources</button>
+        </div>
+      </div>
+    `;
+    actions.fp_talk_to_friend = ()=>go("fp_talk_to_friend");
+    actions.fp_support_affected = ()=>go("fp_support_affected");
+    actions.nextSteps = ()=>go("nextSteps");
+    return;
+  }
+
+  if(id==="fp_power_harm"){
+    screen.innerHTML = backBtn() + `
+      <div class="card">
+        <div class="h1"><i class="ph-bold ph-scales" aria-hidden="true"></i> Power gaps make real consent nearly impossible.</div>
+        <div class="p">When someone has more power — because of age, status, popularity, money, or authority — the other person may not feel free to say no, even if they technically "could." That's what makes power dynamics so dangerous.</div>
+        <div class="fpBoundaryBox">
+          <h4>Why power changes everything:</h4>
+          A coach and athlete, a boss and employee, an older person and a younger one, someone popular and someone who wants to fit in — these gaps create pressure that's invisible to the person with more power. Your friend may say "they wanted it" without recognising that the other person may have felt they had no real choice.
+        </div>
+        <div class="fpSignalList">
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-warning" aria-hidden="true"></i></span><span>If the affected person is a minor and your friend is in a position of authority (teacher, coach, mentor, boss), this may involve mandatory reporting obligations. A school counsellor or trusted adult can help you understand what's required.</span></div>
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-lock" aria-hidden="true"></i></span><span>The affected person may be afraid to speak up because your friend controls something they need — a grade, a spot on the team, social standing, housing, or money. That fear is part of the harm.</span></div>
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-shield-check" aria-hidden="true"></i></span><span>Your friend may need to hear that the other person's "willingness" doesn't count the same when there's a power gap. Ethical responsibility falls on the person with more power.</span></div>
+          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-megaphone" aria-hidden="true"></i></span><span>If there's a risk of retaliation — your friend using their status to punish or discredit the affected person — that risk needs to be taken seriously, and it may change who you involve.</span></div>
+        </div>
+        <div class="grid" style="margin-top:16px;">
+          <button class="btn btnPrimary" data-action="fp_talk_to_friend">How do I talk to my friend about this?</button>
+          <button class="btn" data-action="fp_support_affected">Supporting the person who was affected</button>
+          <button class="btn" data-action="nextSteps">Go to next steps & resources</button>
         </div>
       </div>
     `;
@@ -10326,14 +10420,14 @@ function render(){
           <h4>If they haven't told you directly:</h4>
           <div class="fpAffectedRow"><span class="fpAffectedRowIcon"><i class="ph-bold ph-chat-circle-dots" aria-hidden="true"></i></span><span>A simple check-in — "Hey, I heard something happened and I just wanted to check in on you, no pressure" — can mean everything. You don't need to name what you know. Just open the door.</span></div>
           <div class="fpAffectedRow"><span class="fpAffectedRowIcon"><i class="ph-bold ph-prohibit" aria-hidden="true"></i></span><span>Don't tell them what you know unless they ask — they may not be ready, and having information shared without their control can feel like another violation.</span></div>
-          <div class="fpAffectedRow"><span class="fpAffectedRowIcon">🎧</span><span>If they do bring it up: listen without steering. Don't tell them what to do. Ask "What do you need right now?" and mean it.</span></div>
+          <div class="fpAffectedRow"><span class="fpAffectedRowIcon"><i class="ph-bold ph-headphones" aria-hidden="true"></i></span><span>If they do bring it up: listen without steering. Don't tell them what to do. Ask "What do you need right now?" and mean it.</span></div>
         </div>
 
         <div class="fpAffectedBox" style="margin-top:10px;">
           <h4>If they've told you directly:</h4>
           <div class="fpAffectedRow"><span class="fpAffectedRowIcon"><i class="ph-bold ph-stop-circle" aria-hidden="true"></i></span><span>Don't minimise ("I'm sure he didn't mean it"), investigate ("what were you wearing?"), or rush them ("you should report it").</span></div>
           <div class="fpAffectedRow"><span class="fpAffectedRowIcon"><i class="ph-bold ph-check-circle" aria-hidden="true"></i></span><span>Do say: "I believe you. It's not your fault. I'm here."</span></div>
-          <div class="fpAffectedRow"><span class="fpAffectedRowIcon">🔄</span><span>Ask them what kind of support they want — practical help, someone to talk to, help finding resources, or just company. Let them lead.</span></div>
+          <div class="fpAffectedRow"><span class="fpAffectedRowIcon"><i class="ph-bold ph-arrows-clockwise" aria-hidden="true"></i></span><span>Ask them what kind of support they want — practical help, someone to talk to, help finding resources, or just company. Let them lead.</span></div>
           <div class="fpAffectedRow"><span class="fpAffectedRowIcon"><i class="ph-bold ph-warning" aria-hidden="true"></i></span><span>Maintain their confidentiality unless there's a safety concern. Their story is theirs to tell — not yours to spread, even with good intentions.</span></div>
         </div>
 
