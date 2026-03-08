@@ -5548,11 +5548,13 @@ details.expando summary:focus-visible {
 .entryPathGroupLabel[data-color="coral"]   { color: #E07A5F; }
 .entryPathGroupLabel[data-color="amber"]   { color: #F2CC8F; }
 .entryPathGroupLabel[data-color="teal"]    { color: #81B29A; }
+.entryPathGroupLabel[data-color="sky"]     { color: #7EB8D4; }
 .entryPathGroupLabel[data-color="lavender"]{ color: #B8A9C9; }
 
 .eyebrow[data-color="coral"]   { color: #E07A5F; }
 .eyebrow[data-color="amber"]   { color: #F2CC8F; }
 .eyebrow[data-color="teal"]    { color: #81B29A; }
+.eyebrow[data-color="sky"]     { color: #7EB8D4; }
 .eyebrow[data-color="lavender"]{ color: #B8A9C9; }
 
 /* Section color-coding: button tints */
@@ -5590,6 +5592,18 @@ details.expando summary:focus-visible {
   border-color: rgba(129,178,154,.55);
   border-left: 3px solid rgba(129,178,154,.70);
   box-shadow: 0 0 8px rgba(129,178,154,.20);
+}
+
+.btn[data-color="sky"] {
+  border-left: 3px solid rgba(126,184,212,.40);
+  background: rgba(126,184,212,.06);
+  padding-left: 13px;
+}
+.btn[data-color="sky"]:hover {
+  background: rgba(126,184,212,.14);
+  border-color: rgba(126,184,212,.55);
+  border-left: 3px solid rgba(126,184,212,.70);
+  box-shadow: 0 0 8px rgba(126,184,212,.20);
 }
 
 .btn[data-color="lavender"] {
@@ -9923,8 +9937,8 @@ function render(){
         <div class="entryPathGroupLabel" data-color="amber">Someone told me</div>
         ${btn("Someone said I made them uncomfortable","e4","btn","amber")}
         ${btn("I'm being accused of something I didn't do","e8","btn","amber")}
-        <div class="entryPathGroupLabel" data-color="teal">I already know</div>
-        ${btn("I know what I did was wrong \u2014 and I want to make it right","e10","btn","teal")}
+        <div class="entryPathGroupLabel" data-color="sky">I already know</div>
+        ${btn("I know what I did was wrong \u2014 and I want to make it right","e10","btn","sky")}
         <div class="entryPathGroupLabel" data-color="teal">I need help understanding</div>
         ${btn("I don't know how to explain it","e5","btn","teal")}
         ${btn("I just want to understand consent better","e6","btn","teal")}
