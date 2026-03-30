@@ -1874,6 +1874,14 @@
       font-size: 13px;
       color: var(--text-muted);
       line-height: 1.5;
+      max-height: 200px;
+      overflow: hidden;
+      transition: opacity 0.25s ease, max-height 0.25s ease, padding-bottom 0.25s ease;
+    }
+    .contentSection.open .contentSection__summary{
+      opacity: 0;
+      max-height: 0;
+      padding-bottom: 0;
     }
     .contentSection__body{
       max-height: 0;
