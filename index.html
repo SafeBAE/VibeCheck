@@ -2380,11 +2380,13 @@
 .siWrap .panelBody{
   max-height:0;
   opacity:0;
+  overflow:hidden;
   transform: translateY(-6px);
   transition: max-height var(--dur-normal) ease, opacity .22s ease, transform .22s ease;
 }.siWrap .panel.open .panelBody{
-  max-height: 520px;
+  max-height: 2400px;
   opacity:1;
+  overflow:visible;
   transform: translateY(0);
 }.siWrap .inner{
   padding: 0 18px 18px 18px;
@@ -2494,11 +2496,11 @@
   border-color: rgba(21,255,200,.24);
 }
 .bwWrap .panelBody{
-  max-height:0; opacity:0; transform: translateY(-6px);
+  max-height:0; opacity:0; overflow:hidden; transform: translateY(-6px);
   transition: max-height .30s ease, opacity .24s ease, transform .24s ease;
 }
 .bwWrap .panel.open .panelBody{
-  max-height:640px; opacity:1; transform: translateY(0);
+  max-height:2400px; opacity:1; overflow:visible; transform: translateY(0);
 }
 .bwWrap .inner{ padding: 0 16px 18px 16px; }
 .bwLayout{
@@ -4203,23 +4205,27 @@
 #rainContinue{ transition:opacity .5s ease; }
 
 /* =====================================================
-   CROWD VOLUME KNOB — Embarrassed
+   CROWD VOLUME KNOB — Embarrassed (redesigned)
    ===================================================== */
 .crowdKnobWrap{
   position:relative;
   margin:12px 0;
-  border-radius: var(--radius-lg);
+  border-radius: 18px;
   border:1px solid rgba(209,254,255,.14);
-  background:rgba(6,18,24,.98);
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(255,140,160,.10), transparent 60%),
+    radial-gradient(120% 80% at 50% 100%, rgba(21,255,200,.06), transparent 60%),
+    linear-gradient(180deg, rgba(8,22,30,.96), rgba(4,14,20,.98));
   overflow:hidden;
-  padding:16px 16px 14px;
-  min-height:280px;
+  padding:18px 18px 18px;
+  min-height:340px;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:10px;
+  gap:14px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(209,254,255,.05);
 }
-/* Floating noise words */
+/* Floating noise words — softer, like ambient thoughts, NOT crowding the knob */
 .crowdWords{
   position:absolute;
   inset:0;
@@ -4229,23 +4235,26 @@
 }
 .crowdWord{
   position:absolute;
-  font-size:11px;
-  font-weight:700;
-  color:rgba(255,100,80,0.7);
-  letter-spacing:.3px;
+  font-size:11.5px;
+  font-weight:600;
+  color:rgba(255,165,150,.62);
+  letter-spacing:.2px;
   white-space:nowrap;
-  animation:crowdFloat linear infinite;
-  transition:opacity .4s ease, transform .4s ease;
+  font-style:italic;
+  animation:crowdFloat ease-in-out infinite;
+  transition:opacity .55s ease, transform .55s ease, filter .55s ease;
   pointer-events:none;
-  text-shadow:0 0 8px rgba(255,80,60,.35);
-  max-width:40%;
+  text-shadow:0 0 14px rgba(255,120,100,.30);
+  filter: blur(.2px);
+  max-width:36%;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 @keyframes crowdFloat{
-  0%   { transform:translateY(0px); }
-  50%  { transform:translateY(-6px); }
-  100% { transform:translateY(0px); }
+  0%   { transform:translate(0px, 0px); }
+  33%  { transform:translate(2px, -5px); }
+  66%  { transform:translate(-2px, -2px); }
+  100% { transform:translate(0px, 0px); }
 }
 /* Knob area */
 .crowdKnobArea{
@@ -4253,63 +4262,80 @@
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:6px;
+  gap:10px;
   z-index:3;
-  margin-top:8px;
+  margin-top:6px;
 }
 .crowdKnobLabel{
-  font-size:10px;font-weight:900;
-  text-transform:uppercase;letter-spacing:.6px;
-  color:rgba(255,120,80,.75);
-  transition:color .5s ease;
+  font-size:10.5px; font-weight:900;
+  text-transform:uppercase; letter-spacing:1.2px;
+  color:rgba(255,180,170,.70);
+  transition:color .6s ease, letter-spacing .6s ease;
   min-height:14px;
   text-align:center;
 }
 .crowdKnobRing{
   position:relative;
-  width:180px;height:180px;
+  width:200px; height:200px;
   cursor:grab;
   touch-action:none;
   -webkit-tap-highlight-color:transparent;
   user-select:none;
+  border-radius:50%;
+  /* Soft outer shadow to lift the knob off the panel */
+  filter: drop-shadow(0 8px 22px rgba(0,0,0,.45));
 }
 .crowdKnobRing:active{ cursor:grabbing; }
+.crowdKnobRing:hover #crowdKnobCanvas{
+  filter: brightness(1.05);
+}
 #crowdKnobCanvas{
   display:block;
-  width:180px;height:180px;
-  border-radius: var(--radius-pill);
+  width:200px; height:200px;
+  border-radius:50%;
+  transition: filter .25s ease;
 }
 .crowdKnobHandle{
   position:absolute;
   inset:0;
   pointer-events:none;
 }
+/* The volume number now lives INSIDE the knob (overlay), not below */
 .crowdVolNum{
-  font-size:28px;font-weight:900;
-  color:rgba(255,120,80,.85);
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px; font-weight:900;
+  color:rgba(255,200,190,.92);
   font-variant-numeric:tabular-nums;
-  letter-spacing:-.5px;
-  transition:color .4s ease;
+  letter-spacing:-1px;
+  transition:color .5s ease, text-shadow .5s ease;
   line-height:1;
-  min-width:60px;
-  text-align:center;
+  pointer-events:none;
+  text-shadow:
+    0 0 18px rgba(255,120,100,.35),
+    0 2px 4px rgba(0,0,0,.55);
+  z-index:2;
 }
 .crowdMsg{
   text-align:center;
-  font-size:13px;font-weight:900;
+  font-size:13.5px; font-weight:700;
   color:rgba(21,255,200,.0);
-  line-height:1.4;
-  transition:color .6s ease;
-  padding:0 6px;
+  line-height:1.45;
+  transition:color .6s ease, opacity .6s ease;
+  padding:8px 14px;
   min-height:18px;
   z-index:4;
   position:relative;
-  max-width:280px;
-  background:rgba(8,20,28,.75);
-  border-radius:var(--radius-sm);
-  padding:6px 10px;
+  max-width:320px;
+  background:rgba(6,18,24,.78);
+  border:1px solid rgba(209,254,255,.10);
+  border-radius:10px;
+  backdrop-filter: blur(6px);
 }
-.crowdMsg.show{ color:rgba(21,255,200,.90); }
+.crowdMsg.show{ color:rgba(21,255,200,.92); }
 #eyeContinue{ transition:opacity .5s ease; }
 
 /* =====================================================
@@ -5348,8 +5374,8 @@
   .fpEnabling.open .fpEnablingBody { max-height: 800px; }
   .fpDecNode.open .fpDecNodeBody { max-height: 800px; }
   .dsConsentCard.open .dsConsentBody { max-height: 500px; }
-  .siWrap .panel.open .panelBody { max-height: 700px; }
-  .bwWrap .panel.open .panelBody { max-height: 800px; }
+  .siWrap .panel.open .panelBody { max-height: 2400px; }
+  .bwWrap .panel.open .panelBody { max-height: 2400px; }
   .nrmWrap .panel.open .panelBody { max-height: 900px; }
   .repairPanel.open .panelBody { max-height: 2000px; }
 }
@@ -7244,6 +7270,247 @@ function breatheWidget(){
   `;
 }
 
+// (Removed) Paced breathing protocol — reverted to original breatheWidget.
+let pacedBreathCleanup = null;
+function pacedBreathMarkup(){
+  return `
+  <div class="pbWrap" id="pbWrap" style="border:1px solid var(--border); border-radius:14px; background:rgba(0,0,0,.18); padding:14px; margin:12px 0;">
+    <div class="pbStep" id="pbStepIntro">
+      <div style="font-size:12.5px; font-weight:800; color:rgba(21,255,200,.95); letter-spacing:.2px; margin-bottom:6px;">BEFORE WE START</div>
+      <div style="font-size:13px; color:var(--muted); line-height:1.55;">How anxious do you feel right now?</div>
+      <div id="pbSudsBeforeRow" style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+        <input id="pbSudsBefore" type="range" min="0" max="10" step="1" value="6" style="flex:1;" aria-label="Anxiety before, 0 to 10"/>
+        <div style="font-size:13px; font-weight:900; color:var(--sb-mint); min-width:36px; text-align:center;"><span id="pbSudsBeforeNum">6</span>/10</div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+        <button class="btn btnSmall" data-pb-protocol="sigh">Physiological sigh ×3 <span style="opacity:.7;">(60s)</span></button>
+        <button class="btn btnSmall" data-pb-protocol="478">4-7-8 ×4 <span style="opacity:.7;">(75s)</span></button>
+        <button class="btn btnSmall" data-pb-protocol="box">Box breathing ×4 <span style="opacity:.7;">(64s)</span></button>
+      </div>
+      <div style="margin-top:8px; font-size:11.5px; color:var(--muted); line-height:1.4;">
+        Pick one. Physiological sigh is the fastest documented down-shift. 4-7-8 is the strongest for sleep / panic. Box is the most neutral.
+      </div>
+    </div>
+
+    <div class="pbStep" id="pbStepRun" style="display:none;">
+      <div id="pbPhase" style="font-size:13px; font-weight:900; color:var(--sb-light); text-align:center; letter-spacing:.4px;">Get ready…</div>
+      <div style="display:flex; justify-content:center; align-items:center; margin:10px 0;">
+        <div id="pbCircle" style="width:160px; height:160px; border-radius:50%; background:radial-gradient(circle, rgba(21,255,200,.20), rgba(21,255,200,.04) 70%); border:2px solid rgba(21,255,200,.55); transition:transform 1s ease;"></div>
+      </div>
+      <div id="pbCount" style="text-align:center; font-size:22px; font-weight:900; color:var(--sb-mint);">3</div>
+      <div id="pbCycle" style="text-align:center; font-size:11.5px; color:var(--muted); margin-top:4px;">Cycle 0 of 3</div>
+      <div style="display:flex; justify-content:center; margin-top:10px;">
+        <button class="btn btnSmall" id="pbStop">Stop</button>
+      </div>
+    </div>
+
+    <div class="pbStep" id="pbStepAfter" style="display:none;">
+      <div style="font-size:12.5px; font-weight:800; color:rgba(21,255,200,.95); letter-spacing:.2px; margin-bottom:6px;">AFTER</div>
+      <div style="font-size:13px; color:var(--muted); line-height:1.55;">And now?</div>
+      <div id="pbSudsAfterRow" style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+        <input id="pbSudsAfter" type="range" min="0" max="10" step="1" value="4" style="flex:1;" aria-label="Anxiety after, 0 to 10"/>
+        <div style="font-size:13px; font-weight:900; color:var(--sb-mint); min-width:36px; text-align:center;"><span id="pbSudsAfterNum">4</span>/10</div>
+      </div>
+      <div id="pbDelta" style="margin-top:10px; padding:10px 12px; border-radius:10px; background:rgba(21,255,200,.08); border:1px solid rgba(21,255,200,.25); font-size:13px; color:var(--sb-light);"></div>
+      <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+        <button class="btn btnSmall" data-pb-protocol="sigh">Run again</button>
+        <button class="btn btnSmall" id="pbGround">Try grounding instead</button>
+      </div>
+    </div>
+
+    <details id="pbGrounding" style="margin-top:12px; border:1px solid var(--border); border-radius:10px; background:rgba(0,0,0,.22);" >
+      <summary style="cursor:pointer; padding:10px 12px; font-size:12.5px; font-weight:800; color:var(--sb-light); list-style:none;">5-4-3-2-1 grounding (alternative)</summary>
+      <div style="padding:0 12px 12px; font-size:12.5px; color:var(--muted); line-height:1.55;">
+        For when breath feels too hard. Type or just notice:
+        <div style="margin-top:6px; display:flex; flex-direction:column; gap:6px;">
+          <input class="pbGr" placeholder="5 things you can see…" />
+          <input class="pbGr" placeholder="4 things you can feel under your hands…" />
+          <input class="pbGr" placeholder="3 things you can hear…" />
+          <input class="pbGr" placeholder="2 things you can smell…" />
+          <input class="pbGr" placeholder="1 thing you can taste…" />
+        </div>
+      </div>
+    </details>
+  </div>
+  `;
+}
+
+function initPacedBreath(){
+  if(pacedBreathCleanup) pacedBreathCleanup();
+  const wrap = document.getElementById('pbWrap');
+  if(!wrap) return;
+
+  const stepIntro = document.getElementById('pbStepIntro');
+  const stepRun = document.getElementById('pbStepRun');
+  const stepAfter = document.getElementById('pbStepAfter');
+  const phaseEl = document.getElementById('pbPhase');
+  const countEl = document.getElementById('pbCount');
+  const cycleEl = document.getElementById('pbCycle');
+  const circleEl = document.getElementById('pbCircle');
+  const stopBtn = document.getElementById('pbStop');
+  const sudsBefore = document.getElementById('pbSudsBefore');
+  const sudsBeforeNum = document.getElementById('pbSudsBeforeNum');
+  const sudsAfter = document.getElementById('pbSudsAfter');
+  const sudsAfterNum = document.getElementById('pbSudsAfterNum');
+  const deltaEl = document.getElementById('pbDelta');
+  const groundBtn = document.getElementById('pbGround');
+  const groundDetails = document.getElementById('pbGrounding');
+
+  // Style the protocol buttons
+  const allBtns = Array.from(wrap.querySelectorAll('[data-pb-protocol]'));
+  allBtns.forEach(b => {
+    b.style.borderColor = 'rgba(21,255,200,.35)';
+  });
+
+  let timer = null;
+
+  function setPhaseVisual(label, scale){
+    if(phaseEl) phaseEl.textContent = label;
+    if(circleEl) circleEl.style.transform = `scale(${scale})`;
+  }
+
+  function clearTimer(){
+    if(timer){ clearTimeout(timer); timer = null; }
+  }
+
+  // Protocol definitions: each step is {label, secs, scale}
+  const PROTOCOLS = {
+    sigh: {
+      name: 'Physiological sigh',
+      cycles: 3,
+      steps: [
+        { label: 'Inhale through nose', secs: 2, scale: 1.10 },
+        { label: 'Top up — small extra inhale', secs: 1, scale: 1.18 },
+        { label: 'Long exhale through mouth', secs: 6, scale: 0.85 },
+        { label: 'Rest', secs: 2, scale: 1.0 }
+      ]
+    },
+    '478': {
+      name: '4-7-8',
+      cycles: 4,
+      steps: [
+        { label: 'Inhale through nose', secs: 4, scale: 1.18 },
+        { label: 'Hold', secs: 7, scale: 1.18 },
+        { label: 'Exhale through mouth', secs: 8, scale: 0.82 }
+      ]
+    },
+    box: {
+      name: 'Box breathing',
+      cycles: 4,
+      steps: [
+        { label: 'Inhale', secs: 4, scale: 1.18 },
+        { label: 'Hold', secs: 4, scale: 1.18 },
+        { label: 'Exhale', secs: 4, scale: 0.82 },
+        { label: 'Hold', secs: 4, scale: 0.82 }
+      ]
+    }
+  };
+
+  function runProtocol(key){
+    const proto = PROTOCOLS[key];
+    if(!proto) return;
+    stepIntro.style.display = 'none';
+    stepRun.style.display = 'block';
+    stepAfter.style.display = 'none';
+    let cycle = 0;
+    let stepIdx = 0;
+    let secLeft = 0;
+    function advance(){
+      if(cycle >= proto.cycles){
+        // Done
+        setPhaseVisual('Done. Notice anything shift?', 1.0);
+        countEl.textContent = '✓';
+        cycleEl.textContent = `Completed ${proto.cycles} cycles of ${proto.name}`;
+        clearTimer();
+        timer = setTimeout(()=>{
+          stepRun.style.display = 'none';
+          stepAfter.style.display = 'block';
+          // Pre-fill SUDS after to be 2 below before
+          if(sudsBefore && sudsAfter){
+            const target = Math.max(0, Number(sudsBefore.value) - 2);
+            sudsAfter.value = String(target);
+            sudsAfterNum.textContent = String(target);
+            paintDelta();
+          }
+        }, 1200);
+        return;
+      }
+      const step = proto.steps[stepIdx];
+      cycleEl.textContent = `Cycle ${cycle+1} of ${proto.cycles}`;
+      setPhaseVisual(step.label, step.scale);
+      secLeft = step.secs;
+      countEl.textContent = String(secLeft);
+      tick();
+    }
+    function tick(){
+      clearTimer();
+      timer = setTimeout(()=>{
+        secLeft -= 1;
+        if(secLeft <= 0){
+          stepIdx += 1;
+          if(stepIdx >= proto.steps.length){
+            stepIdx = 0;
+            cycle += 1;
+          }
+          advance();
+          return;
+        }
+        countEl.textContent = String(secLeft);
+        tick();
+      }, 1000);
+    }
+    advance();
+  }
+
+  function paintDelta(){
+    if(!deltaEl || !sudsBefore || !sudsAfter) return;
+    const before = Number(sudsBefore.value);
+    const after  = Number(sudsAfter.value);
+    const drop = before - after;
+    if(drop > 0){
+      deltaEl.innerHTML = `<b>You moved ${drop} point${drop===1?'':'s'} down.</b> That's measurable — your nervous system listened. The physiological signal is real, regardless of whether the situation is resolved.`;
+    } else if(drop === 0){
+      deltaEl.innerHTML = `<b>Same level.</b> That happens. Try one more cycle, or switch to grounding — sometimes the body wants a different doorway in.`;
+    } else {
+      deltaEl.innerHTML = `<b>Up by ${-drop}.</b> If it spiked, it can mean the breath made you face what you were avoiding. That's information. Try the 5-4-3-2-1 grounding option below.`;
+    }
+  }
+
+  function onSudsBefore(){ if(sudsBeforeNum) sudsBeforeNum.textContent = sudsBefore.value; }
+  function onSudsAfter(){ if(sudsAfterNum) sudsAfterNum.textContent = sudsAfter.value; paintDelta(); }
+  function onProtoClick(e){
+    const btn = e.target.closest('[data-pb-protocol]');
+    if(!btn) return;
+    runProtocol(btn.dataset.pbProtocol);
+  }
+  function onStop(){
+    clearTimer();
+    stepRun.style.display = 'none';
+    stepAfter.style.display = 'block';
+  }
+  function onGround(){
+    if(!groundDetails) return;
+    groundDetails.open = true;
+    groundDetails.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+
+  if(sudsBefore) sudsBefore.addEventListener('input', onSudsBefore);
+  if(sudsAfter) sudsAfter.addEventListener('input', onSudsAfter);
+  wrap.addEventListener('click', onProtoClick);
+  if(stopBtn) stopBtn.addEventListener('click', onStop);
+  if(groundBtn) groundBtn.addEventListener('click', onGround);
+
+  pacedBreathCleanup = ()=>{
+    clearTimer();
+    if(sudsBefore) sudsBefore.removeEventListener('input', onSudsBefore);
+    if(sudsAfter) sudsAfter.removeEventListener('input', onSudsAfter);
+    wrap.removeEventListener('click', onProtoClick);
+    if(stopBtn) stopBtn.removeEventListener('click', onStop);
+    if(groundBtn) groundBtn.removeEventListener('click', onGround);
+    pacedBreathCleanup = null;
+  };
+}
+
 
 // =====================================================
 // RAIN WINDOW — Sad emotion
@@ -7252,13 +7519,28 @@ let rainWindowCleanup = null;
 
 function rainWindowMarkup(){
   return `
-    <div class="note"><b>Tap the rain</b> if you want. This is what it feels like when something mattered.</div>
+    <div class="note"><b>Tap each drop you want to acknowledge.</b> The rain doesn't have to stop. You're just letting it land.</div>
     <div class="rainWrap" id="rainWrap">
       <canvas id="rainCanvas" class="rainCanvas"></canvas>
       <div class="rainGlass" id="rainGlass"></div>
       <div class="rainMsg" id="rainMsg"></div>
     </div>
-    <div id="rainContinue" style="margin-top:12px;opacity:1;pointer-events:auto;transition:opacity .6s ease;">
+
+    <div id="rainAction" style="display:none; margin-top:12px; padding:14px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.20);">
+      <div style="font-size:12.5px; font-weight:800; color:var(--sb-light); letter-spacing:.2px; margin-bottom:8px;">ONE SMALL THING</div>
+      <div style="font-size:13px; color:var(--muted); line-height:1.55; margin-bottom:10px;">Pick one small action for the next hour. Nothing big — just one move out of stuck.</div>
+      <div style="display:flex; flex-wrap:wrap; gap:6px;">
+        <button class="btn btnSmall rainAct" data-act="walk">Walk outside for 5 min</button>
+        <button class="btn btnSmall rainAct" data-act="call">Text or call someone safe</button>
+        <button class="btn btnSmall rainAct" data-act="write">Write a letter I won't send</button>
+        <button class="btn btnSmall rainAct" data-act="water">Drink water, eat something</button>
+        <button class="btn btnSmall rainAct" data-act="other">Something else</button>
+      </div>
+      <input id="rainActOther" placeholder="One small thing…" style="display:none; width:100%; box-sizing:border-box; margin-top:10px; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:rgba(0,0,0,.30); color:var(--sb-light); font-family:inherit; font-size:13px;" />
+      <div id="rainActEcho" style="display:none; margin-top:10px; font-size:12.5px; color:rgba(180,210,240,.95); line-height:1.55; font-style:italic;"></div>
+    </div>
+
+    <div id="rainContinue" style="margin-top:12px;opacity:.4;pointer-events:none;transition:opacity .6s ease;">
       <button class="btn btnPrimary" data-action="nextSteps" style="width:100%;">Continue →</button>
     </div>
   `;
@@ -7269,6 +7551,8 @@ function initRainWindow(){
   const wrap   = document.getElementById('rainWrap');
   const canvas = document.getElementById('rainCanvas');
   const msgEl  = document.getElementById('rainMsg');
+  const actionEl = document.getElementById('rainAction');
+  const continueEl = document.getElementById('rainContinue');
   if(!canvas || !wrap){ showCanvasFallback(canvas || wrap); return; }
 
   const ctx = canvas.getContext('2d');
@@ -7276,13 +7560,15 @@ function initRainWindow(){
   let W, H, raf;
 
   // --- State ---
-  // progress: 0 = full storm, 1 = full stillness
+  // progress: 0 = nothing acknowledged, 1 = full puddle (everything acknowledged).
+  // Note: rain DOES NOT stop. We're sitting with it, not making it disappear.
   let progress   = 0;
   let taps        = 0;
-  const TAP_GOAL  = 8;   // taps to reach full still pool
+  const TAP_GOAL  = 8;
   let msgStage    = 0;    // 0 = none, 1 = mid, 2 = final
   let puddleR     = 0;    // current puddle radius
   let ripples     = [];   // tap ripples on puddle surface
+  let acknowledgements = []; // floating "noticed" particles
 
   function resize(){
     W = canvas.width  = wrap.clientWidth;
@@ -7324,9 +7610,11 @@ function initRainWindow(){
     const p = progress; // 0..1
 
     // ---- RAIN ----
-    // Rain slows and fades as progress increases
-    const rainAlpha  = 1 - p * 0.95;
-    const speedMult  = 1 - p * 0.85;
+    // Rain stays. We are NOT making the sadness go away.
+    // It softens slightly as the user acknowledges (presence reduces resistance)
+    // but never disappears.
+    const rainAlpha  = 1 - p * 0.30;   // floor at 0.70 alpha — rain remains
+    const speedMult  = 1 - p * 0.25;   // slight slowdown only
 
     if(rainAlpha > 0.02){
       drops.forEach(d => {
@@ -7342,6 +7630,27 @@ function initRainWindow(){
         if(d.y > H + d.len){ d.y = -d.len; d.x = Math.random() * W; }
       });
     }
+
+    // ---- ACKNOWLEDGEMENTS ----
+    // Each tap spawns a soft glow that floats up briefly then fades into the puddle.
+    acknowledgements = acknowledgements.filter(a => a.life > 0);
+    acknowledgements.forEach(a => {
+      const glowR = 4 + (1 - a.life) * 14;
+      const alpha = a.life * 0.7;
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(180,220,255,${alpha})`;
+      ctx.arc(a.x, a.y, glowR, 0, Math.PI * 2);
+      ctx.fill();
+      // Faint cross-twinkle
+      ctx.strokeStyle = `rgba(209,254,255,${alpha * 0.5})`;
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(a.x - glowR, a.y); ctx.lineTo(a.x + glowR, a.y);
+      ctx.moveTo(a.x, a.y - glowR); ctx.lineTo(a.x, a.y + glowR);
+      ctx.stroke();
+      a.y += a.vy;
+      a.life -= 0.018;
+    });
 
     // ---- PUDDLE ----
     // Puddle grows from radius 0 to PUDDLE_MAX_R as progress increases
@@ -7444,33 +7753,98 @@ function initRainWindow(){
     taps = Math.min(taps + 1, TAP_GOAL);
     progress = taps / TAP_GOAL;
 
+    // Spawn an acknowledgement glow at the tap point
+    const rect = canvas.getBoundingClientRect();
+    const cx = (e.touches && e.touches[0])
+      ? e.touches[0].clientX - rect.left
+      : (e.clientX != null ? e.clientX - rect.left : Math.random() * W);
+    const cy = (e.touches && e.touches[0])
+      ? e.touches[0].clientY - rect.top
+      : (e.clientY != null ? e.clientY - rect.top : Math.random() * H * 0.6);
+    acknowledgements.push({ x: cx, y: cy, vy: 0.4 + Math.random() * 0.5, life: 1 });
+
     // Add ripple if puddle is visible
     if(progress > 0.15) ripples.push({ life: 1 });
 
-    // Message milestones
-    if(taps >= 4 && msgStage === 0){
+    // Message milestones — now framed as "letting it land," not "making it stop"
+    if(taps >= 3 && msgStage === 0){
       msgStage = 1;
-      msgEl.textContent = 'You’re not pushing it away. That counts.';
+      msgEl.textContent = 'Each tap is one piece you’re acknowledging.';
       msgEl.classList.add('show');
     }
-    if(taps >= TAP_GOAL && msgStage < 2){
+    if(taps >= 6 && msgStage === 1){
       msgStage = 2;
-      msgEl.textContent = 'When the storm slows, you can see more clearly. Clarity is what accountability needs — and where better choices begin.';
+      msgEl.textContent = 'Feeling sadness isn’t the same as being stuck in it.';
+      msgEl.classList.add('show');
+    }
+    if(taps >= TAP_GOAL && msgStage < 3){
+      msgStage = 3;
+      msgEl.textContent = 'You sat with it. Now pick one small action below.';
+      // Reveal action section — rain keeps falling.
       setTimeout(()=>{
-        const cont = document.getElementById('rainContinue');
-        if(cont){ cont.style.opacity='1'; cont.style.pointerEvents='auto'; }
-      }, 800);
+        if(actionEl) actionEl.style.display = 'block';
+      }, 600);
     }
   }
 
   canvas.addEventListener('click',      onTap);
   canvas.addEventListener('touchstart', onTap, {passive: false});
 
+  // ----- One small thing (behavioral activation) -----
+  const ACT_LINES = {
+    walk: 'Even five minutes outside changes blood flow and breath. The body argues with sadness through movement.',
+    call: 'Reaching to one safe person is the loneliness antidote. You don\'t have to explain everything.',
+    write: 'Writing what you can\'t send still moves it from inside to outside. That\'s the whole point.',
+    water: 'Hydration and a small bite. Sadness lies about basic care.',
+    other: 'Whatever you picked — let it be small enough that you\'ll actually do it.'
+  };
+  function unlockContinue(){
+    if(continueEl){ continueEl.style.opacity = '1'; continueEl.style.pointerEvents = 'auto'; }
+  }
+  function onActClick(e){
+    const btn = e.target.closest('.rainAct');
+    if(!btn) return;
+    const key = btn.dataset.act;
+    Array.from(actionEl.querySelectorAll('.rainAct')).forEach(b => {
+      b.style.background = b === btn ? 'rgba(100,160,220,.18)' : '';
+      b.style.borderColor = b === btn ? 'rgba(100,160,220,.55)' : '';
+    });
+    const otherInput = document.getElementById('rainActOther');
+    const echoEl = document.getElementById('rainActEcho');
+    if(key === 'other'){
+      if(otherInput){ otherInput.style.display = 'block'; otherInput.focus(); }
+    } else {
+      if(otherInput) otherInput.style.display = 'none';
+      if(echoEl){
+        echoEl.textContent = ACT_LINES[key] || ACT_LINES.other;
+        echoEl.style.display = 'block';
+      }
+      unlockContinue();
+    }
+  }
+  function onOtherInput(e){
+    const echoEl = document.getElementById('rainActEcho');
+    if(e.target.value.trim().length >= 3){
+      if(echoEl){ echoEl.textContent = ACT_LINES.other; echoEl.style.display = 'block'; }
+      unlockContinue();
+    }
+  }
+  if(actionEl){
+    actionEl.addEventListener('click', onActClick);
+    const otherInput = document.getElementById('rainActOther');
+    if(otherInput) otherInput.addEventListener('input', onOtherInput);
+  }
+
   rainWindowCleanup = ()=>{
     cancelAnimationFrame(raf);
     window.removeEventListener('resize', resize);
     canvas.removeEventListener('click',      onTap);
     canvas.removeEventListener('touchstart', onTap);
+    if(actionEl){
+      actionEl.removeEventListener('click', onActClick);
+      const otherInput = document.getElementById('rainActOther');
+      if(otherInput) otherInput.removeEventListener('input', onOtherInput);
+    }
     rainWindowCleanup = null;
   };
 }
@@ -7483,19 +7857,45 @@ let eyeGridCleanup = null;
 
 function eyeGridMarkup(){
   return `
-    <div class="note"><b>Turn it down</b> if you want. Drag the knob counterclockwise to quiet the noise.</div>
+    <!-- Pre-knob: spotlight calibration -->
+    <div id="spotPre" style="margin-bottom:12px; padding:14px; border-radius:14px; border:1px solid rgba(255,140,160,.30); background:rgba(255,120,140,.06);">
+      <div style="font-size:11.5px; font-weight:800; letter-spacing:.3px; color:rgba(255,200,210,.95); margin-bottom:6px;">QUICK CHECK FIRST</div>
+      <div style="font-size:13px; color:var(--sb-light); line-height:1.55; margin-bottom:8px;">
+        Picture the people who saw or could have heard about it.<br/>
+        <b>In 3 days, how many of them will still be thinking about this?</b>
+      </div>
+      <div id="spotChips" style="display:flex; flex-wrap:wrap; gap:6px;">
+        <button class="btn btnSmall" data-spot="0">0</button>
+        <button class="btn btnSmall" data-spot="1">1</button>
+        <button class="btn btnSmall" data-spot="few">A few</button>
+        <button class="btn btnSmall" data-spot="lots">Lots of them</button>
+        <button class="btn btnSmall" data-spot="all">Basically everyone</button>
+      </div>
+    </div>
+
+    <div class="note" id="eyeNote"><b>Now: turn it down.</b> Drag the knob counterclockwise to quiet the noise.</div>
     <div class="crowdKnobWrap" id="crowdKnobWrap">
       <div class="crowdWords" id="crowdWords"></div>
       <div class="crowdKnobArea">
         <div class="crowdKnobLabel" id="crowdKnobLabel">THE NOISE</div>
         <div class="crowdKnobRing" id="crowdKnobRing">
-          <canvas id="crowdKnobCanvas" width="180" height="180"></canvas>
+          <canvas id="crowdKnobCanvas" width="400" height="400"></canvas>
           <div class="crowdKnobHandle" id="crowdKnobHandle"></div>
+          <div class="crowdVolNum" id="crowdVolNum">100</div>
         </div>
-        <div class="crowdVolNum" id="crowdVolNum">100</div>
       </div>
       <div class="crowdMsg" id="crowdMsg"></div>
     </div>
+
+    <!-- Post-silence: spotlight effect reveal -->
+    <div id="spotPost" style="display:none; margin-top:12px; padding:14px; border-radius:14px; border:1px solid rgba(255,140,160,.30); background:rgba(255,120,140,.06);">
+      <div style="font-size:11.5px; font-weight:800; letter-spacing:.3px; color:rgba(255,200,210,.95); margin-bottom:6px;">THE SPOTLIGHT EFFECT</div>
+      <div id="spotRevealText" style="font-size:13px; color:var(--sb-light); line-height:1.55;"></div>
+      <div style="margin-top:10px; padding:10px 12px; border-radius:10px; background:rgba(0,0,0,.22); border:1px solid var(--border); font-size:12.5px; color:var(--muted); line-height:1.55;">
+        Gilovich's research finds people overestimate how much others notice and remember about them by a factor of <b>2–3×</b>. The noise lives mostly in your head; the room moves on faster than you think.
+      </div>
+    </div>
+
     <div id="eyeContinue" style="margin-top:12px;opacity:1;pointer-events:auto;transition:opacity .6s ease;">
       <button class="btn btnPrimary" data-action="nextSteps" style="width:100%;">Continue →</button>
     </div>
@@ -7516,7 +7916,14 @@ function initEyeGrid(){
 
   const ctx = canvas.getContext('2d');
   if(!ctx){ showCanvasFallback(canvas); return; }
-  const CX = 90, CY = 90, R = 70;
+  // Internal canvas is 400x400 (2x DPR); we draw in a 200-point coordinate
+  // space scaled up so the knob is crisp on retina displays.
+  ctx.setTransform(2, 0, 0, 2, 0, 0);
+  const CX = 100, CY = 100, R = 80;       // outer arc radius
+  const RIM_R = 70;                        // outer rim of the knob body
+  const FACE_R = 60;                       // face of the knob body
+  const DOT_R = 5.5;                       // indicator pip radius
+  const DOT_OFFSET = 46;                   // distance of pip from center
 
   // Words that float around — things said / thought about you
   const WORDS = [
@@ -7527,19 +7934,23 @@ function initEyeGrid(){
     "can't believe", "totally", "wild", "so cringe"
   ];
 
-  // Place words in evenly distributed positions around the edges
-  // avoiding the center knob area and the bottom message area
+  // Place words ONLY in the top band and the narrow side strips.
+  // The knob occupies roughly 24% < x < 76% from y=14% to y=78%, so we keep
+  // words above and to the sides of that area to avoid visual clutter.
   let wordEls = [];
-  // Pre-defined positions: spread around perimeter in 3 rows, avoiding center & bottom
   const POSITIONS = [
-    // Top row
-    {x:5,  y:4},  {x:20, y:3},  {x:36, y:6},  {x:52, y:3},  {x:66, y:5},  {x:78, y:4},
-    // Upper-mid row (sides only, avoiding center where knob is)
-    {x:3,  y:20}, {x:15, y:24}, {x:68, y:22}, {x:78, y:18},
-    // Mid row (far sides only)
-    {x:2,  y:40}, {x:74, y:38}, {x:3,  y:56}, {x:72, y:53},
-    // Lower-mid row (sides only, above message area)
-    {x:5,  y:70}, {x:18, y:74}, {x:64, y:72},
+    // Top band (y < 11%): wide spread
+    {x:4,  y:3},  {x:22, y:6},  {x:42, y:3},  {x:60, y:7},  {x:78, y:4},
+    // Upper outer corners
+    {x:3,  y:14}, {x:80, y:13},
+    // Left side narrow strip (x < 18%)
+    {x:2,  y:32}, {x:8,  y:46}, {x:3,  y:60},
+    // Right side narrow strip (x > 80%)
+    {x:82, y:30}, {x:84, y:48}, {x:80, y:62},
+    // Lower band (above the message), kept clear of center knob
+    {x:6,  y:80}, {x:78, y:80},
+    // Reserve a couple variants for variety
+    {x:14, y:8},  {x:68, y:6}
   ];
   WORDS.forEach((w, i) => {
     const el = document.createElement('div');
@@ -7548,9 +7959,11 @@ function initEyeGrid(){
     const pos = POSITIONS[i % POSITIONS.length];
     el.style.left = pos.x + '%';
     el.style.top  = pos.y + '%';
-    el.style.transform = 'translate(0, 0)'; // anchor from top-left, not center
-    el.style.animationDelay = (i * 0.18) + 's';
-    el.style.animationDuration = (3.5 + (i % 4) * 0.8) + 's';
+    // Vary size + animation to feel ambient, not scripted
+    const sizeJitter = (i % 4) * 0.6;        // 0..1.8 px
+    el.style.fontSize = (10.5 + sizeJitter) + 'px';
+    el.style.animationDelay = (i * 0.22) + 's';
+    el.style.animationDuration = (4.2 + (i % 5) * 0.6) + 's';
     wordsEl.appendChild(el);
     wordEls.push(el);
   });
@@ -7572,51 +7985,183 @@ function initEyeGrid(){
   }
 
   function drawKnob(deg) {
-    ctx.clearRect(0, 0, 180, 180);
+    // Clear in canvas pixel-space (we set transform to 2x; clear native size)
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, 400, 400);
+    ctx.restore();
 
-    // Track arc - background
-    const arcStart = (MIN_DEG - 90) * Math.PI / 180;
-    const arcEnd   = (MAX_DEG - 90) * Math.PI / 180;
-    ctx.arc(CX, CY, R, arcStart, arcEnd);
-    ctx.strokeStyle = 'rgba(209,254,255,0.12)';
-    ctx.lineWidth = 6;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-
-    // Filled arc (current value, from min to current)
     const vol = degToVol(deg);
-    const filledEnd = (deg - 90) * Math.PI / 180;
-    if(vol > 0){
-      const r = Math.min(255, Math.round(255 * (vol/100) * 1.8));
-      const g = Math.max(40, Math.round(255 - vol * 2.2));
+    const t = vol / 100; // 0..1
+
+    // ---------- 1. Outer ambient halo (warm at high vol, cool at low) ----------
+    const haloGrad = ctx.createRadialGradient(CX, CY, R + 4, CX, CY, R + 22);
+    if(t > 0.3){
+      haloGrad.addColorStop(0, `rgba(255,140,120,${0.16 * t})`);
+      haloGrad.addColorStop(1, 'rgba(255,140,120,0)');
+    } else {
+      haloGrad.addColorStop(0, `rgba(21,255,200,${0.18 * (1 - t)})`);
+      haloGrad.addColorStop(1, 'rgba(21,255,200,0)');
+    }
+    ctx.beginPath();
+    ctx.arc(CX, CY, R + 22, 0, Math.PI*2);
+    ctx.fillStyle = haloGrad;
+    ctx.fill();
+
+    // ---------- 2. Tick marks around the rim ----------
+    const arcStartDeg = MIN_DEG - 90;
+    const arcEndDeg   = MAX_DEG - 90;
+    for(let d = arcStartDeg; d <= arcEndDeg; d += 10){
+      const isMajor = ((d - arcStartDeg) % 30) === 0;
+      const rad = d * Math.PI / 180;
+      const inner = R + (isMajor ? 2 : 4);
+      const outer = R + (isMajor ? 10 : 7);
       ctx.beginPath();
-      ctx.arc(CX, CY, R, arcStart, filledEnd);
-      ctx.strokeStyle = `rgba(${r},${g},60,0.85)`;
-      ctx.lineWidth = 6;
+      ctx.moveTo(CX + Math.cos(rad) * inner, CY + Math.sin(rad) * inner);
+      ctx.lineTo(CX + Math.cos(rad) * outer, CY + Math.sin(rad) * outer);
+      ctx.strokeStyle = isMajor ? 'rgba(209,254,255,0.34)' : 'rgba(209,254,255,0.16)';
+      ctx.lineWidth = isMajor ? 1.5 : 1;
       ctx.lineCap = 'round';
       ctx.stroke();
     }
 
-    // Knob body
-    const grad = ctx.createRadialGradient(CX-8, CY-8, 4, CX, CY, 52);
-    grad.addColorStop(0, 'rgba(60,90,100,0.95)');
-    grad.addColorStop(1, 'rgba(15,35,45,0.98)');
+    // ---------- 3. Background arc (the unlit "track") ----------
+    const arcStart = (MIN_DEG - 90) * Math.PI / 180;
+    const arcEnd   = (MAX_DEG - 90) * Math.PI / 180;
     ctx.beginPath();
-    ctx.arc(CX, CY, 52, 0, Math.PI*2);
-    ctx.fillStyle = grad;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(209,254,255,0.18)';
-    ctx.lineWidth = 1.5;
+    ctx.arc(CX, CY, R, arcStart, arcEnd);
+    ctx.strokeStyle = 'rgba(209,254,255,0.10)';
+    ctx.lineWidth = 7;
+    ctx.lineCap = 'round';
     ctx.stroke();
 
-    // Indicator dot
-    const dotRad = (deg - 90) * Math.PI / 180;
-    const dotX = CX + Math.cos(dotRad) * 36;
-    const dotY = CY + Math.sin(dotRad) * 36;
+    // ---------- 4. Lit arc (current value) ----------
+    const filledEnd = (deg - 90) * Math.PI / 180;
+    if(vol > 0){
+      // Color smoothly transitions: low=mint, mid=amber, high=coral
+      let r, g, b;
+      if(t < 0.4){
+        // 0..0.4 mint -> amber
+        const k = t / 0.4;
+        r = Math.round(21 + (255 - 21) * k);
+        g = Math.round(255 + (210 - 255) * k);
+        b = Math.round(200 + (110 - 200) * k);
+      } else {
+        // 0.4..1 amber -> coral
+        const k = (t - 0.4) / 0.6;
+        r = Math.round(255 + (255 - 255) * k);
+        g = Math.round(210 + (130 - 210) * k);
+        b = Math.round(110 + (110 - 110) * k);
+      }
+      // Soft glow
+      ctx.save();
+      ctx.shadowColor = `rgba(${r},${g},${b},0.55)`;
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(CX, CY, R, arcStart, filledEnd);
+      ctx.strokeStyle = `rgba(${r},${g},${b},0.92)`;
+      ctx.lineWidth = 7;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // ---------- 5. Outer rim (bevel) ----------
+    const rimGrad = ctx.createRadialGradient(CX-8, CY-12, 2, CX, CY, RIM_R);
+    rimGrad.addColorStop(0,   'rgba(72,98,108,0.95)');
+    rimGrad.addColorStop(0.65,'rgba(36,58,68,0.98)');
+    rimGrad.addColorStop(1,   'rgba(10,22,30,1)');
     ctx.beginPath();
-    ctx.arc(dotX, dotY, 5, 0, Math.PI*2);
-    ctx.fillStyle = vol < 5 ? 'rgba(21,255,200,0.9)' : `rgba(${Math.min(255,180+Math.round(vol*.75))},${Math.max(40,200-Math.round(vol*1.6))},80,0.9)`;
+    ctx.arc(CX, CY, RIM_R, 0, Math.PI*2);
+    ctx.fillStyle = rimGrad;
     ctx.fill();
+
+    // Subtle inner shadow on rim
+    ctx.beginPath();
+    ctx.arc(CX, CY, RIM_R, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // ---------- 6. Knurled texture (small dashes around rim edge) ----------
+    for(let a = 0; a < 360; a += 6){
+      const rad = a * Math.PI / 180;
+      const r1 = RIM_R - 5;
+      const r2 = RIM_R - 1.5;
+      ctx.beginPath();
+      ctx.moveTo(CX + Math.cos(rad) * r1, CY + Math.sin(rad) * r1);
+      ctx.lineTo(CX + Math.cos(rad) * r2, CY + Math.sin(rad) * r2);
+      ctx.strokeStyle = 'rgba(209,254,255,0.10)';
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+    }
+
+    // ---------- 7. Knob face (recessed) ----------
+    const faceGrad = ctx.createRadialGradient(CX-10, CY-14, 4, CX, CY, FACE_R);
+    faceGrad.addColorStop(0,   'rgba(50,76,86,0.98)');
+    faceGrad.addColorStop(0.7, 'rgba(20,38,48,0.98)');
+    faceGrad.addColorStop(1,   'rgba(8,18,26,1)');
+    ctx.beginPath();
+    ctx.arc(CX, CY, FACE_R, 0, Math.PI*2);
+    ctx.fillStyle = faceGrad;
+    ctx.fill();
+
+    // Inner ring outline (recessed look)
+    ctx.beginPath();
+    ctx.arc(CX, CY, FACE_R, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // ---------- 8. Top gloss highlight ----------
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(CX, CY, FACE_R - 1, 0, Math.PI*2);
+    ctx.clip();
+    const glossGrad = ctx.createLinearGradient(CX, CY - FACE_R, CX, CY);
+    glossGrad.addColorStop(0,   'rgba(255,255,255,0.10)');
+    glossGrad.addColorStop(0.6, 'rgba(255,255,255,0)');
+    ctx.fillStyle = glossGrad;
+    ctx.fillRect(CX - FACE_R, CY - FACE_R, FACE_R * 2, FACE_R);
+    ctx.restore();
+
+    // ---------- 9. Indicator pip (from rim toward face edge) ----------
+    const dotRad = (deg - 90) * Math.PI / 180;
+    const pipX1 = CX + Math.cos(dotRad) * (FACE_R - 16);
+    const pipY1 = CY + Math.sin(dotRad) * (FACE_R - 16);
+    const pipX2 = CX + Math.cos(dotRad) * (FACE_R - 4);
+    const pipY2 = CY + Math.sin(dotRad) * (FACE_R - 4);
+    // Pip color matches lit-arc tone
+    let pr, pg, pb;
+    if(vol < 5){ pr = 21; pg = 255; pb = 200; }
+    else if(t < 0.4){
+      const k = t / 0.4;
+      pr = Math.round(21 + (255 - 21) * k);
+      pg = Math.round(255 + (210 - 255) * k);
+      pb = Math.round(200 + (110 - 200) * k);
+    } else {
+      const k = (t - 0.4) / 0.6;
+      pr = Math.round(255);
+      pg = Math.round(210 + (130 - 210) * k);
+      pb = Math.round(110);
+    }
+    // Pip line
+    ctx.save();
+    ctx.shadowColor = `rgba(${pr},${pg},${pb},0.55)`;
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.moveTo(pipX1, pipY1);
+    ctx.lineTo(pipX2, pipY2);
+    ctx.strokeStyle = `rgba(${pr},${pg},${pb},0.92)`;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    // Pip end dot
+    ctx.beginPath();
+    ctx.arc(CX + Math.cos(dotRad) * DOT_OFFSET, CY + Math.sin(dotRad) * DOT_OFFSET, DOT_R, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(${pr},${pg},${pb},0.95)`;
+    ctx.fill();
+    ctx.restore();
   }
 
   function updateAll(deg) {
@@ -7629,24 +8174,50 @@ function initEyeGrid(){
     // Update handle rotation for CSS
     handleEl.style.transform = `rotate(${volDeg}deg)`;
 
-    // Word opacity — fully gone at vol 0
+    // Word opacity, scale, and blur — fully gone at vol 0, ghostly at low vol
     wordEls.forEach((el, i) => {
-      const base = (vol / 100) * 0.90;
-      const jitter = (Math.sin(i * 1.7) * 0.12);
+      const t = vol / 100;
+      const base = t * 0.78;
+      const jitter = (Math.sin(i * 1.7) * 0.10);
       el.style.opacity = Math.max(0, Math.min(1, base + jitter));
-      const scale = 0.65 + (vol / 100) * 0.45;
-      el.style.transform = `scale(${scale + Math.sin(i)*0.04})`;
+      const scale = 0.72 + t * 0.38;
+      el.style.transform = `scale(${scale + Math.sin(i) * 0.03})`;
       el.style.transformOrigin = 'top left';
+      // More blur as volume drops — words become indistinct, not just small
+      const blurPx = (1 - t) * 1.6;
+      el.style.filter = `blur(${blurPx.toFixed(2)}px)`;
     });
 
-    // Label
-    if(vol > 66) labelEl.textContent = 'THE NOISE';
-    else if(vol > 33) labelEl.textContent = 'getting quieter...';
-    else if(vol > 5)  labelEl.textContent = 'almost there';
-    else              labelEl.textContent = 'silence';
+    // Label — stays consistent with copy that softens
+    if(vol > 66){
+      labelEl.textContent = 'THE NOISE';
+      labelEl.style.color = 'rgba(255,170,150,.85)';
+      labelEl.style.letterSpacing = '1.2px';
+    } else if(vol > 33){
+      labelEl.textContent = 'getting quieter…';
+      labelEl.style.color = 'rgba(255,210,160,.78)';
+      labelEl.style.letterSpacing = '1.0px';
+    } else if(vol > 5){
+      labelEl.textContent = 'almost there';
+      labelEl.style.color = 'rgba(180,240,210,.78)';
+      labelEl.style.letterSpacing = '0.8px';
+    } else {
+      labelEl.textContent = 'silence';
+      labelEl.style.color = 'rgba(21,255,200,.92)';
+      labelEl.style.letterSpacing = '2.4px';
+    }
 
-    // Vol num color
-    volNumEl.style.color = vol < 10 ? 'rgba(21,255,200,.9)' : vol < 40 ? 'rgba(255,210,100,.8)' : 'rgba(255,120,80,.85)';
+    // Center volume number color tracks the knob's lit-arc tone
+    if(vol < 5){
+      volNumEl.style.color = 'rgba(180,255,220,.95)';
+      volNumEl.style.textShadow = '0 0 22px rgba(21,255,200,.45), 0 2px 4px rgba(0,0,0,.55)';
+    } else if(vol < 40){
+      volNumEl.style.color = 'rgba(255,230,170,.95)';
+      volNumEl.style.textShadow = '0 0 18px rgba(255,200,120,.40), 0 2px 4px rgba(0,0,0,.55)';
+    } else {
+      volNumEl.style.color = 'rgba(255,200,180,.95)';
+      volNumEl.style.textShadow = '0 0 18px rgba(255,140,110,.40), 0 2px 4px rgba(0,0,0,.55)';
+    }
 
     // Milestones
     if(vol <= 50 && !milestoneShown.has(50)){
@@ -7660,6 +8231,23 @@ function initEyeGrid(){
       msgEl.classList.add('show');
       const cont = document.getElementById('eyeContinue');
       if(cont){ cont.style.opacity='1'; cont.style.pointerEvents='auto'; }
+      // Reveal the spotlight effect post-card
+      const spotPost = document.getElementById('spotPost');
+      const spotRevealText = document.getElementById('spotRevealText');
+      if(spotPost && spotRevealText){
+        const guess = window.__safebaeSpotlightGuess || null;
+        const guessLabel = {
+          '0': 'zero',
+          '1': 'one',
+          'few': 'a few',
+          'lots': 'lots of them',
+          'all': 'basically everyone'
+        }[guess] || 'a number';
+        spotRevealText.innerHTML = guess
+          ? `You guessed <b>${guessLabel}</b>. Whatever you guessed, the research says the real number is probably lower than that.`
+          : `Whatever you guessed, the research says the real number is probably lower than that.`;
+        spotPost.style.display = 'block';
+      }
     }
     // Show/hide messages and continue button reactively based on current vol
     if(milestoneShown.has(10)){
@@ -7725,6 +8313,25 @@ function initEyeGrid(){
   window.addEventListener('mouseup',    onEnd);
   window.addEventListener('touchend',   onEnd);
 
+  // Spotlight calibration chips
+  const spotChips = document.getElementById('spotChips');
+  function paintSpot(picked){
+    if(!spotChips) return;
+    Array.from(spotChips.querySelectorAll('[data-spot]')).forEach(b => {
+      const active = b.dataset.spot === picked;
+      b.style.background = active ? 'rgba(255,140,160,.18)' : '';
+      b.style.borderColor = active ? 'rgba(255,140,160,.55)' : '';
+      b.style.color = active ? '#ffd6dc' : '';
+    });
+  }
+  function onSpotClick(e){
+    const btn = e.target.closest('[data-spot]');
+    if(!btn) return;
+    window.__safebaeSpotlightGuess = btn.dataset.spot;
+    paintSpot(btn.dataset.spot);
+  }
+  if(spotChips) spotChips.addEventListener('click', onSpotClick);
+
   eyeGridCleanup = () => {
     canvas.removeEventListener('mousedown',  onStart);
     canvas.removeEventListener('touchstart', onStart);
@@ -7732,6 +8339,7 @@ function initEyeGrid(){
     window.removeEventListener('touchmove',  onMove);
     window.removeEventListener('mouseup',    onEnd);
     window.removeEventListener('touchend',   onEnd);
+    if(spotChips) spotChips.removeEventListener('click', onSpotClick);
     eyeGridCleanup = null;
   };
 }
@@ -7810,12 +8418,60 @@ function initVibeJukebox(){
   let currentVibe = null;
   let cardIdx = 0;
 
+  function renderReadyCommit(){
+    tiles.style.display = 'none';
+    content.style.display = 'block';
+    content.innerHTML = `
+      <div class="vjCardWrap">
+        <div class="vjCardTitle">✓ Before you go</div>
+        <div class="vjCard">
+          <div class="vjCardHead" style="font-size:15px;">One sentence — what's the thing you'll do differently?</div>
+          <div class="vjCardBody" style="margin-bottom:10px;">Doesn't have to be big. Make it specific enough that you'd recognize yourself doing it. Implementation intentions roughly double follow-through.</div>
+          <input id="vjReadyInput" placeholder="Next time, I will…" style="width:100%; box-sizing:border-box; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:rgba(0,0,0,.30); color:var(--sb-light); font-family:inherit; font-size:13px;" />
+          <div id="vjReadyHint" style="font-size:11.5px; color:var(--muted); margin-top:6px;">Type at least a few words to unlock continue.</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+          <button class="btn btnPrimary" id="vjReadyDone" disabled style="flex:1; opacity:.5;">Lock it in & continue →</button>
+          <button class="btn" id="vjReadyBack" style="flex:0 0 auto;">← Change vibe</button>
+        </div>
+      </div>
+    `;
+    const input = document.getElementById('vjReadyInput');
+    const doneBtn = document.getElementById('vjReadyDone');
+    const backBtn = document.getElementById('vjReadyBack');
+    const hint = document.getElementById('vjReadyHint');
+    if(input){
+      input.addEventListener('input', ()=>{
+        const ok = input.value.trim().length >= 4;
+        if(doneBtn){
+          doneBtn.disabled = !ok;
+          doneBtn.style.opacity = ok ? 1 : .5;
+        }
+        if(hint) hint.textContent = ok ? 'Looking good. Tap continue when ready.' : 'Type at least a few words to unlock continue.';
+      });
+    }
+    if(doneBtn){
+      doneBtn.addEventListener('click', ()=>{
+        try {
+          localStorage.setItem('safebae:okayCommitment', JSON.stringify({ text: input.value.trim(), savedAt: Date.now() }));
+        } catch(e){}
+        const nb = document.querySelector('[data-action="nextSteps"]');
+        if(nb) nb.click();
+      });
+    }
+    if(backBtn){
+      backBtn.addEventListener('click', ()=>{
+        tiles.style.display = 'grid';
+        content.style.display = 'none';
+      });
+    }
+  }
+
   function renderCards(vibe){
     const v = VIBES[vibe];
-    if(!v){ 
-      // ready — just go to next steps
-      const nextBtn = document.querySelector('[data-action="nextSteps"]');
-      if(nextBtn) nextBtn.click();
+    if(!v){
+      // ready — require a one-sentence commitment first
+      renderReadyCommit();
       return;
     }
     currentVibe = vibe;
@@ -7873,7 +8529,7 @@ function initVibeJukebox(){
 
 function catRunnerMarkup(){
   return `
-    
+
     <div class="note" style="border-left-color: rgba(209,254,255,.35); background: rgba(209,254,255,.05); color: var(--muted);">
       <b style="color: var(--sb-light);">Why a game?</b>
       When you feel numb, your brain is hitting pause. This interaction provides the tangible stimulus your nervous system needs to wake back up.
@@ -7919,6 +8575,13 @@ function catRunnerMarkup(){
       <div style="margin-top:10px; font-size:12px; color: var(--muted); line-height:1.35;">
         Controls: <b>Space</b>/<b>↑</b> jump • <b>↓</b> fast-drop • tap to jump on mobile • <b>R</b> restart
       </div>
+
+      <details style="margin-top:12px; border:1px solid var(--border); border-radius:10px; background:rgba(0,0,0,.22);">
+        <summary style="cursor:pointer; padding:8px 12px; font-size:12px; font-weight:800; color:var(--sb-light); list-style:none;">Other things that help (sensory shortcuts)</summary>
+        <div style="padding:0 12px 10px; font-size:12px; color:var(--muted); line-height:1.55;">
+          Cold water on your wrists. Step outside for 30 seconds. Sour candy or strong mint. Wrap in a heavy blanket. Press your back into the wall. Hum out a long exhale. These are evidence-based for dissociation; pick one that's easy.
+        </div>
+      </details>
     </div>
   `;
 }
@@ -8449,7 +9112,7 @@ function spiralInterruptMarkup(){
       <div class="panelHeader" id="si_header" tabindex="0" role="button" aria-expanded="false" aria-controls="si_body">
         <div class="titleBlock">
           <div class="panelTitle">Spiral Interrupt</div>
-          <div class="panelSub">Click to open. Tap the spiral to steady it.</div>
+          <div class="panelSub">Three steps. Then a spiral to steady. Tap to open.</div>
         </div>
         <div class="chev" aria-hidden="true">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -8460,6 +9123,55 @@ function spiralInterruptMarkup(){
 
       <div class="panelBody" id="si_body">
         <div class="inner">
+
+          <!-- Step 1: Identity / behavior reframe -->
+          <div style="padding:12px 14px; border-radius:12px; border:1px solid rgba(200,100,200,.30); background:rgba(180,80,180,.06); margin-bottom:10px;">
+            <div style="font-size:11.5px; font-weight:800; letter-spacing:.3px; color:rgba(220,170,220,.95); margin-bottom:6px;">STEP 1 — SHAME SAYS / TRUTH SAYS</div>
+            <div style="font-size:12.5px; color:var(--muted); line-height:1.55; margin-bottom:8px;">Shame attacks who you are. Pick whichever is loudest right now.</div>
+            <div id="si_shameChips" style="display:flex; flex-wrap:wrap; gap:6px;">
+              <button class="btn btnSmall" data-shame="monster">"I'm a monster"</button>
+              <button class="btn btnSmall" data-shame="predator">"I'm a predator"</button>
+              <button class="btn btnSmall" data-shame="broken">"I'm broken"</button>
+              <button class="btn btnSmall" data-shame="ruined">"I've ruined everything"</button>
+              <button class="btn btnSmall" data-shame="other">Something else</button>
+            </div>
+            <input id="si_shameOther" placeholder="What is shame saying?" style="display:none; width:100%; box-sizing:border-box; margin-top:8px; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,.30); color:var(--sb-light); font-size:13px; font-family:inherit;" />
+            <div id="si_truth" style="display:none; margin-top:10px; padding:10px 12px; border-radius:10px; background:rgba(0,0,0,.25); border:1px solid rgba(180,80,180,.30); font-size:13px; color:var(--sb-light); line-height:1.55;"></div>
+          </div>
+
+          <!-- Step 2: Self-compassion break (Neff) -->
+          <div style="padding:12px 14px; border-radius:12px; border:1px solid rgba(200,100,200,.30); background:rgba(180,80,180,.06); margin-bottom:10px;">
+            <div style="font-size:11.5px; font-weight:800; letter-spacing:.3px; color:rgba(220,170,220,.95); margin-bottom:6px;">STEP 2 — SELF-COMPASSION BREAK</div>
+            <div style="font-size:12.5px; color:var(--muted); line-height:1.55; margin-bottom:10px;">Three lines, in order. Read each, then tap to confirm. (Kristin Neff's evidence-based protocol.)</div>
+            <div id="si_scList" style="display:flex; flex-direction:column; gap:8px;">
+              <button class="btn si-sc" data-sc="0" style="text-align:left; font-size:13px; padding:10px 12px; border-radius:10px; line-height:1.5;">
+                <span style="display:block; font-weight:800;">1. Mindfulness</span>
+                <span style="display:block; color:var(--muted);">"This is a moment of suffering. I'm hurting right now."</span>
+              </button>
+              <button class="btn si-sc" data-sc="1" disabled style="text-align:left; font-size:13px; padding:10px 12px; border-radius:10px; line-height:1.5; opacity:.5;">
+                <span style="display:block; font-weight:800;">2. Common humanity</span>
+                <span style="display:block; color:var(--muted);">"I'm not the only one. Many people have caused harm and worked to repair it."</span>
+              </button>
+              <button class="btn si-sc" data-sc="2" disabled style="text-align:left; font-size:13px; padding:10px 12px; border-radius:10px; line-height:1.5; opacity:.5;">
+                <span style="display:block; font-weight:800;">3. Self-kindness</span>
+                <span style="display:block; color:var(--muted);">"May I be kind to myself as I face this honestly."</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Defusion -->
+          <div style="padding:12px 14px; border-radius:12px; border:1px solid rgba(200,100,200,.30); background:rgba(180,80,180,.06); margin-bottom:10px;">
+            <div style="font-size:11.5px; font-weight:800; letter-spacing:.3px; color:rgba(220,170,220,.95); margin-bottom:6px;">STEP 3 — UNHOOK FROM THE THOUGHT</div>
+            <div style="font-size:12.5px; color:var(--muted); line-height:1.55; margin-bottom:8px;">Try saying it to yourself this way (ACT defusion):</div>
+            <div style="padding:10px 12px; border-radius:10px; background:rgba(0,0,0,.25); border:1px solid rgba(180,80,180,.30); font-size:13.5px; color:var(--sb-light); line-height:1.55; font-style:italic;">
+              "I'm having the thought that I'm a bad person."
+            </div>
+            <div style="font-size:11.5px; color:var(--muted); line-height:1.5; margin-top:8px;">
+              The thought is something passing through, not who you are. You can let it be there and still keep working.
+            </div>
+          </div>
+
+          <!-- Spiral -->
           <div class="spiralStage" id="si_stage" tabindex="0" aria-label="Tap to steady the spiral">
             <svg id="si_spiral" viewBox="0 0 200 200" aria-hidden="true">
               <path d="M100 100
@@ -8483,7 +9195,7 @@ function spiralInterruptMarkup(){
             <button id="si_skip" style="appearance:none;border:1px solid rgba(209,254,255,.20);background:rgba(0,0,0,.25);color:rgba(209,254,255,.65);font-size:11px;font-weight:700;padding:5px 12px;border-radius:999px;cursor:pointer;">I've done this before — skip</button>
           </div>
 
-          <div class="footer">Spiraling feels productive. It isn't.</div>
+          <div class="footer">Shame thrives in secrecy. Naming it shrinks it.</div>
         </div>
       </div>
     </div>
@@ -8555,6 +9267,16 @@ function initSpiralInterrupt(){
     panel.classList.add('open');
     header.setAttribute('aria-expanded', 'true');
     startSpin();
+    // Scroll the panel header into view so the user can scroll down
+    // through the three steps + spiral. Without this, the panel can
+    // expand below the visible viewport and the user thinks it's empty.
+    setTimeout(()=>{
+      try {
+        header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch(e){
+        header.scrollIntoView();
+      }
+    }, 250);
   }
 
   function closePanel(){
@@ -8614,6 +9336,62 @@ function initSpiralInterrupt(){
 
   resetSpiral();
 
+  // ===== Shame statement → truth reframe =====
+  const shameChipsWrap = document.getElementById('si_shameChips');
+  const shameOtherInput = document.getElementById('si_shameOther');
+  const truthEl = document.getElementById('si_truth');
+  const TRUTH_BY_SHAME = {
+    monster:  "You're not a monster. You made a harmful choice. The version of you that's facing it now is the part that grows.",
+    predator: "A label collapses you into a single word. You're a person who needs to look honestly at a behavior — and change it. That is the work. It does not define you forever.",
+    broken:   "You're not broken. You're hurting. Hurting and broken are very different states — one moves, the other doesn't.",
+    ruined:   "Nothing is permanently ruined except the ability to hide from this. You can still repair, change, and become trustworthy again — slowly.",
+    other:    "Whatever shame is saying, the reframe is the same: you are not the worst thing you did. You are the person now choosing what to do about it."
+  };
+  function paintShame(picked){
+    if(!shameChipsWrap) return;
+    Array.from(shameChipsWrap.querySelectorAll('[data-shame]')).forEach(b => {
+      const active = b.dataset.shame === picked;
+      b.style.background = active ? 'rgba(200,100,200,.18)' : '';
+      b.style.borderColor = active ? 'rgba(200,100,200,.55)' : '';
+      b.style.color = active ? '#f1d6f1' : '';
+    });
+  }
+  function onShameClick(e){
+    const btn = e.target.closest('[data-shame]');
+    if(!btn) return;
+    const key = btn.dataset.shame;
+    paintShame(key);
+    if(key === 'other'){
+      if(shameOtherInput){ shameOtherInput.style.display = 'block'; shameOtherInput.focus(); }
+      truthEl.style.display = 'block';
+      truthEl.innerHTML = `<b>Truth says:</b> ${TRUTH_BY_SHAME.other}`;
+    } else {
+      if(shameOtherInput) shameOtherInput.style.display = 'none';
+      truthEl.style.display = 'block';
+      truthEl.innerHTML = `<b>Truth says:</b> ${TRUTH_BY_SHAME[key] || TRUTH_BY_SHAME.other}`;
+    }
+  }
+  if(shameChipsWrap) shameChipsWrap.addEventListener('click', onShameClick);
+
+  // ===== Self-compassion break sequencer =====
+  const scBtns = Array.from(document.querySelectorAll('.si-sc'));
+  function onScClick(e){
+    const btn = e.target.closest('.si-sc');
+    if(!btn || btn.disabled) return;
+    const idx = Number(btn.dataset.sc);
+    btn.style.background = 'rgba(180,80,180,.18)';
+    btn.style.borderColor = 'rgba(180,80,180,.55)';
+    btn.style.color = '#f1d6f1';
+    btn.disabled = true;
+    btn.style.opacity = 1;
+    const next = scBtns[idx + 1];
+    if(next){ next.disabled = false; next.style.opacity = 1; }
+    if(idx === scBtns.length - 1 && msg){
+      msg.textContent = "You named it. Now: tap the spiral if it's still spinning.";
+    }
+  }
+  scBtns.forEach(b => b.addEventListener('click', onScClick));
+
   spiralCleanup = ()=>{
     if(rafId) cancelAnimationFrame(rafId);
     header.removeEventListener('click', togglePanel);
@@ -8621,6 +9399,8 @@ function initSpiralInterrupt(){
     stage.removeEventListener('click', tapToSteady);
     stage.removeEventListener('keydown', onStageKey);
     if(skipBtn) skipBtn.removeEventListener('click', onSkip);
+    if(shameChipsWrap) shameChipsWrap.removeEventListener('click', onShameClick);
+    scBtns.forEach(b => b.removeEventListener('click', onScClick));
     spiralCleanup = null;
   };
 }
@@ -8648,6 +9428,16 @@ function brickWallMarkup(){
 
       <div class="panelBody" id="bw_body">
         <div class="inner">
+          <div id="bw_prompt" style="display:none; padding:12px 14px; margin-bottom:12px; border-radius:12px; border:1px solid rgba(255,160,80,.35); background:rgba(255,140,60,.10);">
+            <div style="font-size:11.5px; font-weight:800; letter-spacing:.2px; color:rgba(255,200,140,.95); margin-bottom:6px;">DOES THIS LIVE IN YOU?</div>
+            <div id="bw_promptText" style="font-size:14px; font-weight:800; color:var(--sb-light); line-height:1.4; margin-bottom:8px;">"…"</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="btn btnSmall" data-bw-self="yes">Yes, I think this</button>
+              <button class="btn btnSmall" data-bw-self="sometimes">Sometimes</button>
+              <button class="btn btnSmall" data-bw-self="no">No</button>
+            </div>
+          </div>
+
           <div class="bwLayout">
             <div>
               <div class="bwWall">
@@ -8655,7 +9445,7 @@ function brickWallMarkup(){
                   <div class="bwMessageInner">
                     You can listen without agreeing.<br/>
                     You can take responsibility without losing yourself.
-                    <span class="small">Try: "I hear you. I'm taking this seriously."</span>
+                    <span class="small">Try: "I hear you. Tell me more about what that was like for you."</span>
                   </div>
                 </div>
                 <div id="bw_bricks" class="bwBricks"></div>
@@ -8667,10 +9457,16 @@ function brickWallMarkup(){
             </div>
             <div class="bwPile">
               <div class="bwPileTitle">Brick Pile</div>
-              <div class="bwPileHint">Drag or tap any brick to set it down.</div>
+              <div class="bwPileHint">Tap a brick. Each one is a defense — read it before you set it down.</div>
               <div id="bw_drop" class="bwDropZone">Drop bricks here</div>
             </div>
           </div>
+
+          <div id="bw_owned" style="display:none; margin-top:14px; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,200,140,.30); background:rgba(255,180,120,.08);">
+            <div style="font-size:11.5px; font-weight:800; letter-spacing:.2px; color:rgba(255,220,180,.95); margin-bottom:6px;">DEFENSES YOU NAMED</div>
+            <div id="bw_ownedList" style="display:flex; flex-direction:column; gap:4px; font-size:12.5px; color:var(--sb-light); line-height:1.5;"></div>
+          </div>
+
           <div class="bwFooter">Defensiveness protects you. It can also block growth.</div>
         </div>
       </div>
@@ -8690,11 +9486,30 @@ function initBrickWall(){
   const dropZone  = document.getElementById('bw_drop');
   const progText  = document.getElementById('bw_progressText');
   const revText   = document.getElementById('bw_revealText');
+  const promptBox = document.getElementById('bw_prompt');
+  const promptText = document.getElementById('bw_promptText');
+  const ownedBox  = document.getElementById('bw_owned');
+  const ownedList = document.getElementById('bw_ownedList');
 
   if(!panel || !header || !brickCont || !message || !dropZone) return;
 
-  const TOTAL = 9;
+  // Nine common defensive scripts (Gottman/NVC-aligned)
+  const DEFENSES = [
+    { script: "I didn't mean to.",                     reframe: "Intent matters less than impact. Both can be true." },
+    { script: "It wasn't that bad.",                    reframe: "Minimization. The other person's experience is the measure, not yours." },
+    { script: "They're overreacting.",                  reframe: "If you don't yet understand the size of their reaction, that's information about what they felt — not about whether they're right." },
+    { script: "Everyone does this.",                    reframe: "Normalization. Common ≠ okay. Frequent ≠ harmless." },
+    { script: "I'm not that kind of person.",           reframe: "Identity defense. You're not your worst moment — and you're not above examining it." },
+    { script: "But what about what they did?",          reframe: "Whataboutism. Their behavior is a separate conversation. Yours is the one in front of you." },
+    { script: "We were both drunk.",                    reframe: "Mutual intoxication doesn't grant consent. It raises the bar for clarity — for both of you." },
+    { script: "They never said no.",                    reframe: "The bar isn't 'no.' The bar is enthusiastic, ongoing yes." },
+    { script: "I was just joking.",                     reframe: "If a joke needs to override their reaction to land, it stopped being a joke." }
+  ];
+
+  const TOTAL = DEFENSES.length;
   let removed = 0;
+  const owned = []; // {script, level: 'yes'|'sometimes'|'no'}
+  let pendingBrick = null;
 
   function clamp(n,a,b){ return Math.max(a,Math.min(b,n)); }
 
@@ -8704,15 +9519,61 @@ function initBrickWall(){
     message.style.setProperty('--bw-blur', ((1-r)*10).toFixed(2)+'px');
     progText.textContent = `${removed} / ${TOTAL} bricks moved`;
     revText.textContent  = `Message: ${Math.round(r*100)}% revealed`;
+    // Personalize final reveal
+    if(removed >= TOTAL){
+      const ownedCount = owned.filter(o => o.level !== 'no').length;
+      const inner = message.querySelector('.bwMessageInner');
+      if(inner){
+        if(ownedCount === 0){
+          inner.innerHTML = 'You named the defenses without owning any of them. <span class="small">Worth re-checking — most of us hold at least one.</span>';
+        } else {
+          inner.innerHTML = `You named <b>${ownedCount}</b> of these as yours.<span class="small">Try: "I hear you. Tell me more about what that was like."</span>`;
+        }
+      }
+    }
   }
 
-  function removeBrick(brick){
-    if(brick.dataset.removed === '1') return;
+  function renderOwned(){
+    if(!ownedBox || !ownedList) return;
+    if(owned.length === 0){
+      ownedBox.style.display = 'none';
+      return;
+    }
+    ownedBox.style.display = 'block';
+    ownedList.innerHTML = owned.map(o => {
+      const tag = o.level === 'yes'
+        ? '<span style="color:rgba(255,180,120,.95); font-weight:800;">[I think this]</span>'
+        : (o.level === 'sometimes'
+          ? '<span style="color:rgba(255,210,140,.85); font-weight:800;">[sometimes]</span>'
+          : '<span style="opacity:.55;">[not me]</span>');
+      const def = DEFENSES.find(d => d.script === o.script);
+      const reframe = def ? def.reframe : '';
+      return `
+        <div style="padding:6px 0; border-top:1px solid rgba(255,200,140,.10);">
+          <div>"${o.script}" ${tag}</div>
+          ${o.level !== 'no' && reframe ? `<div style="font-size:11.5px; color:var(--muted); font-style:italic; margin-top:2px;">${reframe}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function commitBrick(brick){
+    if(!brick || brick.dataset.removed === '1') return;
     brick.dataset.removed = '1';
     brick.style.visibility = 'hidden';
     brick.setAttribute('draggable','false');
     removed++;
     setReveal();
+  }
+
+  function showPrompt(brick){
+    pendingBrick = brick;
+    if(!promptBox || !promptText) { commitBrick(brick); return; }
+    const idx = Number(brick.dataset.id);
+    const def = DEFENSES[idx];
+    promptText.textContent = `"${def.script}"`;
+    promptBox.style.display = 'block';
+    promptBox.scrollIntoView({ behavior:'smooth', block:'nearest' });
   }
 
   // Build bricks
@@ -8722,6 +9583,20 @@ function initBrickWall(){
     b.setAttribute('draggable','true');
     b.dataset.id = i;
     b.dataset.removed = '0';
+    b.dataset.script = DEFENSES[i].script;
+
+    // Show the defense text on the brick
+    b.style.display = 'flex';
+    b.style.alignItems = 'center';
+    b.style.justifyContent = 'center';
+    b.style.padding = '6px 10px';
+    b.style.textAlign = 'center';
+    b.style.fontSize = '11.5px';
+    b.style.fontWeight = '800';
+    b.style.lineHeight = '1.25';
+    b.style.color = 'rgba(20,30,40,.92)';
+    b.textContent = DEFENSES[i].script;
+    b.title = DEFENSES[i].script;
 
     // Drag API
     b.addEventListener('dragstart', (e)=>{
@@ -8729,11 +9604,31 @@ function initBrickWall(){
       e.dataTransfer.setData('text/plain', b.dataset.id);
     });
 
-    // Touch / click fallback
-    b.addEventListener('click', ()=>{ removeBrick(b); });
+    // Touch / click — open prompt instead of immediately removing
+    b.addEventListener('click', ()=>{ if(b.dataset.removed!=='1') showPrompt(b); });
 
     brickCont.appendChild(b);
   }
+
+  // Self-report buttons
+  function onPromptClick(e){
+    const btn = e.target.closest('[data-bw-self]');
+    if(!btn || !pendingBrick) return;
+    const level = btn.dataset.bwSelf;
+    owned.push({ script: pendingBrick.dataset.script, level });
+    renderOwned();
+    commitBrick(pendingBrick);
+    pendingBrick = null;
+    if(promptBox) promptBox.style.display = 'none';
+    // Scroll the growing "Defenses You Named" list into view so users
+    // see it as they accumulate picks (especially after the 3rd brick)
+    setTimeout(()=>{
+      if(ownedBox && ownedBox.style.display !== 'none'){
+        ownedBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 80);
+  }
+  if(promptBox) promptBox.addEventListener('click', onPromptClick);
 
   // Drop zone
   const onDragOver = (e)=>{ e.preventDefault(); dropZone.classList.add('dragOver'); };
@@ -8743,7 +9638,7 @@ function initBrickWall(){
     dropZone.classList.remove('dragOver');
     const id = e.dataTransfer.getData('text/plain');
     const brick = brickCont.querySelector(`.bwBrick[data-id="${id}"]`);
-    if(brick) removeBrick(brick);
+    if(brick && brick.dataset.removed !== '1') showPrompt(brick);
   };
   dropZone.addEventListener('dragover', onDragOver);
   dropZone.addEventListener('dragleave', onDragLeave);
@@ -8774,6 +9669,7 @@ function initBrickWall(){
     dropZone.removeEventListener('dragover', onDragOver);
     dropZone.removeEventListener('dragleave', onDragLeave);
     dropZone.removeEventListener('drop', onDrop);
+    if(promptBox) promptBox.removeEventListener('click', onPromptClick);
     brickWallCleanup = null;
   };
 }
@@ -8802,7 +9698,7 @@ function nextRightMoveMarkup(){
       <div class="panelBody" id="nrmPanelBody">
         <div class="inner">
           <div class="nrmCard">
-            <p style="font-size:13px;color:rgba(209,254,255,.82);margin:0 0 10px 0;line-height:1.4;">Tap through 5 moves — one at a time.</p>
+            <p style="font-size:13px;color:rgba(209,254,255,.82);margin:0 0 10px 0;line-height:1.4;">Tap through 6 steps — one at a time.</p>
 
             <div class="nrmPathWrap" aria-label="Progress path">
               <div class="nrmPath">
@@ -8812,6 +9708,7 @@ function nextRightMoveMarkup(){
                 <div class="nrmNode" id="nrmN2"><span>3</span></div>
                 <div class="nrmNode" id="nrmN3"><span>4</span></div>
                 <div class="nrmNode" id="nrmN4"><span>5</span></div>
+                <div class="nrmNode" id="nrmN5"><span>6</span></div>
               </div>
             </div>
 
@@ -8825,6 +9722,27 @@ function nextRightMoveMarkup(){
               <div class="nrmChallenge" id="nrmChallenge" style="display:none;">
                 <div class="nrmChallengeTitle">Mini challenge</div>
                 <div class="nrmChallengeText" id="nrmChallengeText"></div>
+              </div>
+
+              <!-- Empathy step input (only visible on step 3) -->
+              <div id="nrmEmpathy" style="display:none; margin-top:10px; padding:10px 12px; border-radius:10px; background:rgba(100,160,255,.08); border:1px solid rgba(100,160,255,.30);">
+                <div style="font-size:12px; font-weight:800; color:rgba(180,210,255,.95); margin-bottom:6px; letter-spacing:.2px;">PERSPECTIVE-TAKING</div>
+                <div style="font-size:12.5px; color:var(--muted); line-height:1.5; margin-bottom:8px;">Picture their next 24 hours. What's harder for them now than it was yesterday?</div>
+                <input id="nrmEmpathyInput" placeholder="One sentence — for you, not them." style="width:100%; box-sizing:border-box; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,.30); color:var(--sb-light); font-size:13px; font-family:inherit;" />
+              </div>
+
+              <!-- If-Then implementation intention (only visible on final step) -->
+              <div id="nrmIfThen" style="display:none; margin-top:10px; padding:10px 12px; border-radius:10px; background:rgba(21,255,200,.08); border:1px solid rgba(21,255,200,.30);">
+                <div style="font-size:12px; font-weight:800; color:rgba(150,255,220,.95); margin-bottom:6px; letter-spacing:.2px;">PERSONAL RULE (IF-THEN)</div>
+                <div style="font-size:12.5px; color:var(--muted); line-height:1.5; margin-bottom:8px;">Implementation intentions roughly double follow-through. Make this specific.</div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:11.5px; color:var(--muted);">If…
+                    <input id="nrmIfInput" placeholder="e.g., I'm not 100% sure they want this" style="width:100%; margin-top:3px; box-sizing:border-box; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,.30); color:var(--sb-light); font-size:13px; font-family:inherit;" />
+                  </label>
+                  <label style="font-size:11.5px; color:var(--muted);">Then…
+                    <input id="nrmThenInput" placeholder="e.g., I pause, ask directly, and accept whatever they say" style="width:100%; margin-top:3px; box-sizing:border-box; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,.30); color:var(--sb-light); font-size:13px; font-family:inherit;" />
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -8886,6 +9804,15 @@ function initNextRightMove(){
       ]
     },
     {
+      title: "Empathize.",
+      desc: "Before apology, before action — picture what their day looks like now. Their experience is the measure.",
+      challenges: [
+        "Picture them waking up tomorrow. What's heavier than yesterday?",
+        "Use their name in your head, not just \"they.\" That makes them less abstract.",
+        "Notice if your mind keeps pulling back to your reputation. That's normal — and it's the wrong direction."
+      ]
+    },
+    {
       title: "Apologize (if appropriate).",
       desc: "Keep it short. Don't ask for comfort. Don't ask for forgiveness. Respect whatever response you get.",
       challenges: [
@@ -8905,11 +9832,11 @@ function initNextRightMove(){
     },
     {
       title: "Change behavior.",
-      desc: "Pick one concrete change you'll make next time. If you need education or support, go get it.",
+      desc: "Write one If-Then rule for yourself. Implementation intentions roughly double follow-through.",
       challenges: [
-        "Choose ONE rule for yourself: \"If there's uncertainty, I pause and ask.\"",
-        "Write one sentence: \"Next time, I will ___.\". Make it specific.",
-        "Pick one resource you'll actually use (training, reading, conversation)."
+        "Make the \"If\" specific (a real situation), not vague (\"if I'm uncertain\").",
+        "Make the \"Then\" a tiny, doable action — not a personality.",
+        "Read it back out loud. If it sounds like advice, make it more concrete."
       ]
     }
   ];
@@ -8925,7 +9852,13 @@ function initNextRightMove(){
   const challengeText = document.getElementById("nrmChallengeText");
   const lineFill    = document.getElementById("nrmLineFill");
   const stamp       = document.getElementById("nrmStamp");
-  const nodes       = [0,1,2,3,4].map(i=>document.getElementById("nrmN"+i));
+  const nodes       = [0,1,2,3,4,5].map(i=>document.getElementById("nrmN"+i)).filter(Boolean);
+  const empathyBox  = document.getElementById("nrmEmpathy");
+  const ifThenBox   = document.getElementById("nrmIfThen");
+  const ruleSaveBtn = document.getElementById("nrmRuleSave");
+  const ifInput     = document.getElementById("nrmIfInput");
+  const thenInput   = document.getElementById("nrmThenInput");
+  const ruleStatus  = document.getElementById("nrmRuleStatus");
 
   if(!moveEl || !nextBtn) return;
 
@@ -8945,6 +9878,8 @@ function initNextRightMove(){
       descEl.textContent = "You'll get one next move at a time.";
       badgeText.textContent = "Ready";
       challengeBox.style.display = "none";
+      if(empathyBox) empathyBox.style.display = "none";
+      if(ifThenBox) ifThenBox.style.display = "none";
       lineFill.style.width = "0%";
       nodes.forEach(n=>{ n.classList.remove("active","done"); });
       return;
@@ -8959,9 +9894,16 @@ function initNextRightMove(){
       n.classList.toggle("done", i < idx);
       n.classList.toggle("active", i === idx);
     });
-    challengeBox.style.display = "block";
-    challengeText.textContent = rand(m.challenges);
-    showStamp(idx === moves.length-1 ? "NEXT TIME" : "GOOD");
+    // Empathy step is index 2 (zero-indexed)
+    if(empathyBox) empathyBox.style.display = (idx === 2) ? "block" : "none";
+    // If-Then is the last step
+    const isLast = idx === moves.length - 1;
+    if(ifThenBox) ifThenBox.style.display = isLast ? "block" : "none";
+    if(challengeBox){
+      challengeBox.style.display = isLast ? "none" : "block";
+      if(!isLast) challengeText.textContent = rand(m.challenges);
+    }
+    showStamp(isLast ? "NEXT TIME" : "GOOD");
   }
 
   function onNext(){
@@ -9014,6 +9956,21 @@ function angerPressureMarkup(){
         <button class="btn btnSmall" type="button" id="angerResetBtn">Do a 20s reset</button>
       </div>
     </div>
+
+    <!-- Anger letter — only revealed when level ≥ 7 -->
+    <details id="angerLetterDetails" style="display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; background:rgba(0,0,0,.18); overflow:hidden;">
+      <summary style="cursor:pointer; padding:12px 14px; font-size:13px; font-weight:800; color:var(--sb-light); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <span>Write the thing you want to say</span>
+        <span style="font-size:16px; opacity:.7;">▾</span>
+      </summary>
+      <div style="padding:10px 14px 14px;">
+        <textarea id="angerLetter" rows="5" placeholder="Say it all. No one sees this but you. Re-read it before deciding whether any of it should leave this box." style="width:100%; box-sizing:border-box; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:rgba(0,0,0,.30); color:var(--sb-light); font-family:inherit; font-size:13px; line-height:1.5; resize:vertical;"></textarea>
+        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+          <button class="btn btnSmall" type="button" id="angerLetterClear">Clear</button>
+          <button class="btn btnSmall" type="button" id="angerLetterCopy">Copy</button>
+        </div>
+      </div>
+    </details>
   </div>
   `;
 }
@@ -9029,6 +9986,10 @@ function initAngerPressure(){
   const prompt   = document.getElementById("angerPrompt");
   const resetBtn = document.getElementById("angerResetBtn");
   const ticksEl  = document.getElementById("pressureTicks");
+  const letterDetails = document.getElementById("angerLetterDetails");
+  const letterEl = document.getElementById("angerLetter");
+  const letterClearBtn = document.getElementById("angerLetterClear");
+  const letterCopyBtn = document.getElementById("angerLetterCopy");
 
   if(!meter || !levelEl || !fill || !copy) return;
 
@@ -9046,6 +10007,10 @@ function initAngerPressure(){
     fill.style.width = pct + "%";
     copy.textContent = setCopy(n);
     if(prompt) prompt.style.display = n >= 7 ? "block" : "none";
+    // Letter only appears when heat is 7 or higher
+    if(letterDetails){
+      letterDetails.style.display = n >= 7 ? "block" : "none";
+    }
   }
 
   function update(){
@@ -9075,8 +10040,10 @@ function initAngerPressure(){
   window.addEventListener("resize", onResize);
   meter.addEventListener("input", update);
 
+  // ----- 20-second reset (original) -----
+  let onResetBtn = null;
   if(resetBtn){
-    const onReset = ()=>{
+    onResetBtn = ()=>{
       if(__angerResetTimer) clearInterval(__angerResetTimer);
       let t = 20;
       resetBtn.disabled = true;
@@ -9098,21 +10065,39 @@ function initAngerPressure(){
         resetBtn.textContent = `Reset: ${t}s`;
       }, 1000);
     };
-    resetBtn.addEventListener("click", onReset);
-    angerPressureCleanup = ()=>{
-      meter.removeEventListener("input", update);
-      window.removeEventListener("resize", onResize);
-      resetBtn.removeEventListener("click", onReset);
-      if(__angerResetTimer){ clearInterval(__angerResetTimer); __angerResetTimer = null; }
-      angerPressureCleanup = null;
-    };
-  } else {
-    angerPressureCleanup = ()=>{
-      meter.removeEventListener("input", update);
-      window.removeEventListener("resize", onResize);
-      angerPressureCleanup = null;
-    };
+    resetBtn.addEventListener("click", onResetBtn);
   }
+
+  // ----- Anger letter (vent box) -----
+  const onLetterClear = ()=>{
+    if(letterEl) letterEl.value = '';
+  };
+  const onLetterCopy = ()=>{
+    if(!letterEl) return;
+    const text = (letterEl.value || '').trim();
+    if(!text) return;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(()=>{
+        if(letterCopyBtn){
+          const original = letterCopyBtn.textContent;
+          letterCopyBtn.textContent = 'Copied';
+          setTimeout(()=>{ letterCopyBtn.textContent = original; }, 1400);
+        }
+      });
+    }
+  };
+  if(letterClearBtn) letterClearBtn.addEventListener('click', onLetterClear);
+  if(letterCopyBtn) letterCopyBtn.addEventListener('click', onLetterCopy);
+
+  angerPressureCleanup = ()=>{
+    meter.removeEventListener("input", update);
+    window.removeEventListener("resize", onResize);
+    if(resetBtn && onResetBtn) resetBtn.removeEventListener("click", onResetBtn);
+    if(letterClearBtn) letterClearBtn.removeEventListener('click', onLetterClear);
+    if(letterCopyBtn) letterCopyBtn.removeEventListener('click', onLetterCopy);
+    if(__angerResetTimer){ clearInterval(__angerResetTimer); __angerResetTimer = null; }
+    angerPressureCleanup = null;
+  };
 
   update();
 }
@@ -15141,6 +16126,7 @@ if(state.emotion==="okay"){
 } else {
   if(vibeJukeboxCleanup) vibeJukeboxCleanup();
 }
+
 
     actions.nextSteps=()=>go("nextSteps");
     return;
