@@ -6370,9 +6370,15 @@ document.addEventListener("click", (e)=>{
     e.preventDefault();
     const a = el.getAttribute("data-action");
     /* Privacy-friendly click tracking. Resource-page actions (learn, prevent,
-       repair, shiftThinking, support) only exist on the nextSteps screen; `e9`
-       is the "I think my friend did something" button on the bringsYouHere
-       entry screen. All events are aggregate — no identifiers. */
+       repair, shiftThinking, support, grounding) only exist on the nextSteps
+       screen; `e9` is the "I think my friend did something" button on the
+       bringsYouHere entry screen. All events are aggregate — no identifiers.
+
+       Events are sent to a SEPARATE GoatCounter site (vibe-events) so they
+       don't inflate the main site's visit counts. We bypass count.js here
+       because the loaded library is bound to the main site's endpoint; an
+       Image pixel does exactly what count.js does under the hood (fire-and-
+       forget GET to /count?p=…&t=…&e=true), but to a different URL. */
     try{
       const GC_EVENTS = {
         repair:        { evt: "resource-repair-click",                 ttl: "Resources: Repair clicked" },
@@ -6383,13 +6389,16 @@ document.addEventListener("click", (e)=>{
         grounding:     { evt: "resource-grounding-click",              ttl: "Resources: Ground / reset clicked" },
         e9:            { evt: "entry-friend-pathway-click",            ttl: "Entry: I think my friend did something clicked" }
       };
-      const trackable = Object.prototype.hasOwnProperty.call(GC_EVENTS, a);
-      if(trackable && window.goatcounter && typeof window.goatcounter.count === "function"){
+      const GC_EVENTS_ENDPOINT = "https://vibe-events.goatcounter.com/count";
+      if(Object.prototype.hasOwnProperty.call(GC_EVENTS, a)){
         const { evt, ttl } = GC_EVENTS[a];
-        window.goatcounter.count({ path: evt, title: ttl, event: true });
+        const url = GC_EVENTS_ENDPOINT
+          + "?p="   + encodeURIComponent(evt)
+          + "&t="   + encodeURIComponent(ttl)
+          + "&e=true"
+          + "&rnd=" + Math.random().toString(36).slice(2);
+        new Image(1,1).src = url;
         console.log("[gc] tracked:", evt);
-      } else if(trackable) {
-        console.warn("[gc] could not track — window.goatcounter not ready");
       }
     }catch(err){ console.warn("[gc] tracking error:", err); }
     actions[a]?.();
@@ -11547,7 +11556,8 @@ function render(){
         <div class="fpHero">
           <div class="fpHeroIcon">👥</div>
           <div class="fpHeroTitle">I think my friend did something</div>
-          <div class="fpHeroSub">You’re here because you’re worried about a friend, and you didn’t just ignore it. That is really important.o reflect — especially when it’s uncomfortable — measurably reduces the chance of repeating harm.  </div>
+          <div class="fpHeroSub">You’re here because you’re worried about a friend, and you didn’t just ignore it. That is really important. Choosing to reflect — especially when it’s uncomfortable — measurably reduces the chance of repeating harm.</div>
+        </div>
         <div class="note" style="margin:0 0 16px;">
           This is a genuinely hard position. You're not the one who caused harm, and you're not the person affected.
           But you're connected to both — and what you do next can make a real difference.
