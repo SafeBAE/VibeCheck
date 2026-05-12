@@ -6369,14 +6369,26 @@ document.addEventListener("click", (e)=>{
   if(el){
     e.preventDefault();
     const a = el.getAttribute("data-action");
-    /* Privacy-friendly click tracking for resources page (these data-actions only exist on nextSteps) */
+    /* Privacy-friendly click tracking. Resource-page actions (learn, prevent,
+       repair, shiftThinking, support) only exist on the nextSteps screen; `e9`
+       is the "I think my friend did something" button on the bringsYouHere
+       entry screen. All events are aggregate — no identifiers. */
     try{
-      if((a === "repair" || a === "shiftThinking") && window.goatcounter && typeof window.goatcounter.count === "function"){
-        const evt = a === "repair" ? "resource-repair-click" : "resource-shift-your-thinking-click";
-        const ttl = a === "repair" ? "Resources: Repair clicked" : "Resources: Shift Your Thinking clicked";
+      const GC_EVENTS = {
+        repair:        { evt: "resource-repair-click",                 ttl: "Resources: Repair clicked" },
+        shiftThinking: { evt: "resource-shift-your-thinking-click",    ttl: "Resources: Shift Your Thinking clicked" },
+        learn:         { evt: "resource-learn-click",                  ttl: "Resources: Learn clicked" },
+        prevent:       { evt: "resource-prevent-click",                ttl: "Resources: Prevent it from happening again clicked" },
+        support:       { evt: "resource-support-click",                ttl: "Resources: Talk to someone / Get support clicked" },
+        grounding:     { evt: "resource-grounding-click",              ttl: "Resources: Ground / reset clicked" },
+        e9:            { evt: "entry-friend-pathway-click",            ttl: "Entry: I think my friend did something clicked" }
+      };
+      const trackable = Object.prototype.hasOwnProperty.call(GC_EVENTS, a);
+      if(trackable && window.goatcounter && typeof window.goatcounter.count === "function"){
+        const { evt, ttl } = GC_EVENTS[a];
         window.goatcounter.count({ path: evt, title: ttl, event: true });
         console.log("[gc] tracked:", evt);
-      } else if((a === "repair" || a === "shiftThinking")) {
+      } else if(trackable) {
         console.warn("[gc] could not track — window.goatcounter not ready");
       }
     }catch(err){ console.warn("[gc] tracking error:", err); }
