@@ -6126,6 +6126,444 @@ details.expando summary:hover {
   .vcSearchInline .vcSearchDropdown{ min-width: 0; left: 0; right: 0; }
 }
 
+/* ===== Friend Pathway: 4-Step Scripted Conversation (C4) ===== */
+.fpTalkSteps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+  margin: 0 0 14px;
+  padding: 4px 6px 0;
+}
+.fpTalkStep {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  min-width: 0;
+}
+.fpTalkStep::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 60%;
+  right: -40%;
+  height: 2px;
+  background: rgba(209,254,255,.12);
+  z-index: 0;
+}
+.fpTalkStep:last-child::after { display: none; }
+.fpTalkStep.done::after { background: rgba(21,255,200,.50); }
+.fpTalkStepDot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.30);
+  border: 2px solid rgba(209,254,255,.20);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(209,254,255,.65);
+  z-index: 1;
+  position: relative;
+  transition: all var(--dur-normal) var(--ease-out);
+  flex-shrink: 0;
+}
+.fpTalkStep.active .fpTalkStepDot {
+  background: rgba(21,255,200,.18);
+  border-color: var(--sb-mint);
+  color: var(--sb-light);
+  box-shadow: 0 0 0 4px rgba(21,255,200,.10);
+}
+.fpTalkStep.done .fpTalkStepDot {
+  background: rgba(21,255,200,.40);
+  border-color: var(--sb-mint);
+  color: var(--sb-deep);
+}
+.fpTalkStepLabel {
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+  color: rgba(209,254,255,.50);
+  letter-spacing: .3px;
+  text-transform: uppercase;
+  line-height: 1.2;
+  padding: 0 2px;
+}
+.fpTalkStep.active .fpTalkStepLabel { color: var(--sb-light); }
+.fpTalkStep.done .fpTalkStepLabel { color: rgba(21,255,200,.85); }
+
+/* Contained "interactive window" — dots + sliding panels live inside one framed widget */
+.fpTalkWindow {
+  border: 1px solid rgba(21,255,200,.30);
+  background: rgba(0,0,0,.22);
+  border-radius: var(--radius-lg);
+  padding: 16px 14px 14px;
+  margin: 8px 0 6px;
+  box-shadow: 0 6px 22px rgba(0,0,0,.20), inset 0 1px 0 rgba(21,255,200,.06);
+}
+.fpTalkViewport {
+  position: relative;
+  overflow: hidden;
+  transition: height .35s var(--ease-out);
+}
+.fpTalkTrack {
+  display: flex;
+  align-items: flex-start; /* prevents flex siblings from stretching to the tallest panel */
+  width: 400%;
+  transition: transform .4s var(--ease-out);
+  will-change: transform;
+}
+.fpTalkPanel {
+  flex: 0 0 25%;
+  width: 25%;
+  padding: 4px 4px 6px;
+  box-sizing: border-box;
+  margin-top: 0;
+}
+.fpTalkPanel[aria-hidden="true"] { /* still rendered for layout, but inert via JS */ }
+@keyframes fpTalkFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fpTalkPanelFade { animation: fpTalkFade .25s var(--ease-out); }
+.fpTalkPanelTitle {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--sb-light);
+  margin: 4px 0 4px;
+  line-height: 1.25;
+}
+.fpTalkPanelLead {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.fpTalkScript {
+  background: rgba(21,255,200,.07);
+  border: 1px solid rgba(21,255,200,.25);
+  border-left: 4px solid var(--sb-mint);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin: 10px 0 12px;
+}
+.fpTalkScriptLabel {
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: rgba(21,255,200,.90);
+  margin-bottom: 6px;
+}
+.fpTalkScriptText {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--sb-light);
+  font-style: italic;
+}
+.fpTalkWhy {
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(209,254,255,.10);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin: 0 0 10px;
+}
+.fpTalkWhyLabel {
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: rgba(209,254,255,.65);
+  margin-bottom: 4px;
+}
+.fpTalkWhyText {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.fpTalkAvoid {
+  background: rgba(200,50,30,.06);
+  border: 1px solid rgba(255,107,107,.22);
+  border-left: 3px solid rgba(255,107,107,.55);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin: 0 0 10px;
+}
+.fpTalkAvoidLabel {
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: rgba(255,160,140,.90);
+  margin-bottom: 4px;
+}
+.fpTalkAvoidText {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(209,254,255,.82);
+  font-style: italic;
+}
+
+.fpTalkRebuttal {
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(255,180,60,.30);
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+  overflow: hidden;
+  transition: border-color var(--dur-normal) ease, background var(--dur-normal) ease;
+}
+.fpTalkRebuttal.open {
+  border-color: rgba(255,180,60,.55);
+  background: rgba(255,180,60,.05);
+}
+.fpTalkRebuttalHead {
+  cursor: pointer;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: rgba(255,210,140,.95);
+  user-select: none;
+  line-height: 1.35;
+}
+.fpTalkRebuttalHead .fpConvoChev {
+  color: rgba(255,180,60,.75);
+  transition: transform .3s var(--ease-out);
+  flex-shrink: 0;
+}
+.fpTalkRebuttal.open .fpTalkRebuttalHead .fpConvoChev { transform: rotate(180deg); }
+.fpTalkRebuttalBody {
+  display: none;
+  padding: 0 16px 14px;
+}
+.fpTalkRebuttal.open .fpTalkRebuttalBody { display: block; }
+.fpTalkRebuttalScript {
+  background: rgba(21,255,200,.06);
+  border-left: 3px solid var(--sb-mint);
+  border-radius: 0 10px 10px 0;
+  padding: 10px 14px;
+  margin: 4px 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--sb-light);
+  line-height: 1.45;
+}
+.fpTalkRebuttalScript b { color: var(--sb-mint); font-style: normal; font-weight: 800; }
+.fpTalkRebuttalNote {
+  font-size: 12.5px;
+  color: rgba(209,254,255,.78);
+  line-height: 1.55;
+}
+
+.fpTalkNav {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.fpTalkNav .btn { flex: 1; min-width: 120px; }
+
+/* ===== Share Tool Card (B17) ===== */
+.shareToolWrap {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(21,255,200,.25);
+  background: rgba(21,255,200,.06);
+  border-radius: var(--radius-md);
+}
+.shareToolLabel {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: rgba(21,255,200,.90);
+  margin-bottom: 4px;
+}
+.shareToolHeadline {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--sb-light);
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+.shareToolSub {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.shareToolRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.shareToolRow .btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+.shareToolConfirm {
+  display: none;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--sb-mint);
+  margin-top: 10px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.shareToolConfirm.show {
+  display: block;
+  animation: shareConfFade .3s var(--ease-out);
+}
+@keyframes shareConfFade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Bystander Confrontation Script Module (C9) ===== */
+.bysHeroNote {
+  background: rgba(255,180,60,.06);
+  border: 1px solid rgba(255,180,60,.22);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin: 8px 0 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(255,210,140,.92);
+}
+.bysHeroNote b { color: var(--sb-light); }
+.bysIntro {
+  font-size: 11.5px;
+  font-weight: 900;
+  color: rgba(21,255,200,.85);
+  margin: 12px 0 8px;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+.bysScriptList { display: grid; gap: 10px; margin: 4px 0 14px; }
+.bysScript {
+  border: 1px solid rgba(209,254,255,.14);
+  background: rgba(0,0,0,.28);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color var(--dur-normal) ease, background var(--dur-normal) ease;
+}
+.bysScript.open {
+  border-color: rgba(21,255,200,.40);
+  background: rgba(21,255,200,.05);
+}
+.bysScriptHead {
+  cursor: pointer;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+.bysScriptIcon {
+  font-size: 22px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 30px;
+  display: grid;
+  place-items: center;
+  color: var(--sb-mint);
+}
+.bysScriptBlock { flex: 1; min-width: 0; }
+.bysScriptTitle {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--sb-light);
+  line-height: 1.35;
+}
+.bysScriptSub {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+.bysScript .fpConvoChev {
+  color: rgba(209,254,255,.55);
+  transition: transform .3s var(--ease-out);
+  flex-shrink: 0;
+}
+.bysScript.open .fpConvoChev { transform: rotate(180deg); color: var(--sb-mint); }
+.bysScriptBody {
+  display: none;
+  padding: 4px 16px 14px;
+}
+.bysScript.open .bysScriptBody { display: block; }
+.bysSayBlock {
+  background: rgba(21,255,200,.06);
+  border-left: 3px solid var(--sb-mint);
+  border-radius: 0 10px 10px 0;
+  padding: 10px 14px;
+  margin: 4px 0 8px;
+}
+.bysSayBlock + .bysSayBlock { margin-top: 8px; }
+.bysSayLabel {
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: rgba(21,255,200,.90);
+  margin-bottom: 4px;
+}
+.bysSayText {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--sb-light);
+  font-weight: 600;
+  font-style: italic;
+}
+.bysDontBlock {
+  background: rgba(200,50,30,.08);
+  border-left: 3px solid rgba(255,107,107,.50);
+  border-radius: 0 10px 10px 0;
+  padding: 10px 14px;
+  margin-top: 8px;
+}
+.bysDontLabel {
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: rgba(255,160,140,.90);
+  margin-bottom: 4px;
+}
+.bysDontText {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(209,254,255,.82);
+  font-weight: 600;
+}
+.bysWhyBlock {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.bysWhyLabel { font-weight: 800; color: rgba(209,254,255,.92); margin-right: 4px; }
+
+@media (prefers-reduced-motion: reduce){
+  .fpTalkPanelFade { animation: none; }
+  .fpTalkTrack { transition: none; }
+  .fpTalkViewport { transition: none; }
+  .shareToolConfirm.show { animation: none; }
+}
+
 </style>
 
 </head>
@@ -6421,14 +6859,40 @@ document.addEventListener("click", (e)=>{
        forget GET to /count?p=…&t=…&e=true), but to a different URL. */
     try{
       const GC_EVENTS = {
-        repair:        { evt: "resource-repair-click",                 ttl: "Resources: Repair clicked" },
-        shiftThinking: { evt: "resource-shift-your-thinking-click",    ttl: "Resources: Shift Your Thinking clicked" },
-        learn:         { evt: "resource-learn-click",                  ttl: "Resources: Learn clicked" },
-        prevent:       { evt: "resource-prevent-click",                ttl: "Resources: Prevent it from happening again clicked" },
-        support:       { evt: "resource-support-click",                ttl: "Resources: Talk to someone / Get support clicked" },
-        grounding:     { evt: "resource-grounding-click",              ttl: "Resources: Ground / reset clicked" },
-        e9:            { evt: "entry-friend-pathway-click",            ttl: "Entry: I think my friend did something clicked" },
-        e8:            { evt: "entry-accused-click",                   ttl: "Entry: I'm being accused of something I didn't do clicked" }
+        // Resource tiles on the nextSteps screen
+        repair:               { evt: "resource-repair-click",                 ttl: "Resources: Repair clicked" },
+        shiftThinking:        { evt: "resource-shift-your-thinking-click",    ttl: "Resources: Shift Your Thinking clicked" },
+        learn:                { evt: "resource-learn-click",                  ttl: "Resources: Learn clicked" },
+        prevent:              { evt: "resource-prevent-click",                ttl: "Resources: Prevent it from happening again clicked" },
+        support:              { evt: "resource-support-click",                ttl: "Resources: Talk to someone / Get support clicked" },
+        grounding:            { evt: "resource-grounding-click",              ttl: "Resources: Ground / reset clicked" },
+
+        // Entry doorways (bringsYouHere) — one per "What brings you here?" button
+        e1:                   { evt: "entry-crossed-boundary-click",          ttl: "Entry: I'm worried I might have crossed a boundary clicked" },
+        e2:                   { evt: "entry-they-mad-click",                  ttl: "Entry: The person I was with is mad clicked" },
+        e3:                   { evt: "entry-not-sure-okay-click",             ttl: "Entry: I'm not sure if what happened was okay clicked" },
+        e4:                   { evt: "entry-made-uncomfortable-click",        ttl: "Entry: Someone said I made them uncomfortable clicked" },
+        e5:                   { evt: "entry-cant-explain-click",              ttl: "Entry: I don't know how to explain it clicked" },
+        e6:                   { evt: "entry-learn-consent-click",             ttl: "Entry: I just want to understand consent better clicked" },
+        e7:                   { evt: "entry-accidental-assault-click",        ttl: "Entry: I think I accidentally sexually assaulted someone clicked" },
+        e8:                   { evt: "entry-accused-click",                   ttl: "Entry: I'm being accused of something I didn't do clicked" },
+        e9:                   { evt: "entry-friend-pathway-click",            ttl: "Entry: I think my friend did something clicked" },
+        e10:                  { evt: "entry-knew-harm-click",                 ttl: "Entry: I know what I did was wrong clicked" },
+
+        // Learn modules (educational content)
+        maleYouth:            { evt: "module-male-youth-click",               ttl: "Module: Men, Masculinity & Sexual Violence clicked" },
+        consentModule:        { evt: "module-consent-click",                  ttl: "Module: Consent clicked" },
+        rapeCulture:          { evt: "module-rape-culture-click",             ttl: "Module: Rape Culture clicked" },
+        sardModule:           { evt: "module-spectrum-of-harm-click",         ttl: "Module: The Spectrum of Harm clicked" },
+        healthyRelationships: { evt: "module-healthy-relationships-click",    ttl: "Module: Healthy Relationships clicked" },
+        digitalSafety:        { evt: "module-digital-safety-click",           ttl: "Module: Digital Safety & Image Consent clicked" },
+
+        // Shift Your Thinking tools (interactive widgets)
+        beliefShift:          { evt: "tool-belief-shift-click",               ttl: "Tool: Belief Shift clicked" },
+        boundaryFlags:        { evt: "tool-boundary-flags-click",             ttl: "Tool: Boundary Flags Game clicked" },
+        angerFunnel:          { evt: "tool-anger-funnel-click",               ttl: "Tool: The Anger Funnel clicked" },
+        thoughtRecord:        { evt: "tool-thought-record-click",             ttl: "Tool: Thought Record clicked" },
+        rejection:            { evt: "tool-rejection-click",                  ttl: "Tool: Understanding Rejection clicked" }
       };
       const GC_EVENTS_ENDPOINT = "https://vibe-events.goatcounter.com/count";
       if(Object.prototype.hasOwnProperty.call(GC_EVENTS, a)){
@@ -6557,6 +7021,84 @@ function closeModal(){
 window.addEventListener("keydown", (e)=>{
   if(e.key === "Escape") closeModal();
 });
+
+// ============================================================
+// Robust share-link helper used by closing + fp_talk_to_friend
+// ============================================================
+const VC_SHARE_URL   = 'https://checkyourvibe.org/';
+const VC_SHARE_TITLE = 'Vibe Check';
+const VC_SHARE_TEXT  = 'A private reflection tool — no account, no sign-up.';
+
+function __vcShowShareConfirm(confirmEl, msg){
+  if(!confirmEl) return;
+  confirmEl.textContent = msg;
+  confirmEl.classList.add('show');
+  // Bump opacity even if CSS animation doesn't run (e.g. reduced motion)
+  confirmEl.style.display = 'block';
+  setTimeout(function(){ confirmEl.classList.remove('show'); }, 2600);
+}
+
+function __vcLegacyCopy(url){
+  // Fallback that works even on file:// and older browsers
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    const ok = document.execCommand && document.execCommand('copy');
+    document.body.removeChild(ta);
+    return !!ok;
+  } catch(e){ return false; }
+}
+
+function vcShareTool(confirmEl){
+  // Try the native share sheet first (works on most phones + some desktops)
+  if(navigator.share){
+    navigator.share({
+      title: VC_SHARE_TITLE,
+      text: VC_SHARE_TEXT,
+      url: VC_SHARE_URL
+    }).then(function(){
+      __vcShowShareConfirm(confirmEl, '✓ Shared');
+    }).catch(function(err){
+      // AbortError = user cancelled the system sheet; stay quiet
+      if(err && (err.name === 'AbortError' || /aborted|cancel/i.test(String(err.message||'')))) return;
+      // Anything else: fall back to clipboard
+      vcCopyLink(confirmEl);
+    });
+    return;
+  }
+  // No Web Share API — go straight to copy-to-clipboard
+  vcCopyLink(confirmEl);
+}
+
+function vcCopyLink(confirmEl){
+  // Clipboard API is the modern path; needs a secure context (HTTPS/localhost)
+  if(navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext !== false){
+    navigator.clipboard.writeText(VC_SHARE_URL)
+      .then(function(){ __vcShowShareConfirm(confirmEl, '✓ Link copied — paste it anywhere to share'); })
+      .catch(function(){
+        // Permission denied or transient failure — use legacy fallback
+        if(__vcLegacyCopy(VC_SHARE_URL)){
+          __vcShowShareConfirm(confirmEl, '✓ Link copied — paste it anywhere to share');
+        } else {
+          __vcShowShareConfirm(confirmEl, 'Copy didn’t work — please copy: ' + VC_SHARE_URL);
+        }
+      });
+    return;
+  }
+  // No clipboard API at all — try execCommand, otherwise show the URL
+  if(__vcLegacyCopy(VC_SHARE_URL)){
+    __vcShowShareConfirm(confirmEl, '✓ Link copied — paste it anywhere to share');
+  } else {
+    __vcShowShareConfirm(confirmEl, 'Copy this link: ' + VC_SHARE_URL);
+  }
+}
 
 // Multi-step tool/module IDs that have their own internal back navigation
 const _toolScreenIds = new Set([
@@ -11165,6 +11707,7 @@ function render(){
     fp_talk_to_friend: 4,
     fp_support_affected: 4,
     fp_enabling: 4,
+    fp_bystander_scripts: 5,
     // "I know what I did was wrong" pathway
     knew_harm_landing: 2,
     knew_harm_acknowledge: 3,
@@ -11957,88 +12500,293 @@ function render(){
     screen.innerHTML = backBtn() + `
       <div class="card">
         <div class="h1">Talking to your friend about it</div>
-        <div class="p">This might be one of the hardest conversations you have — and one of the most important ones. Here's how to approach it without it blowing up or shutting down.</div>
+        <div class="p">This might be one of the hardest conversations you have — and one of the most important ones. Walk through it step by step. Each step gives you a line you can actually say, plus why it works.</div>
 
-        <div class="fpStepHead">Before you say anything</div>
-        <div class="fpSignalList" style="margin-bottom:16px;">
-          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-flower-lotus" aria-hidden="true"></i></span><span>Don't have this conversation when either of you is drunk, in a group, or when you're angry. Private, calm, and sober is the only way this works.</span></div>
-          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-target" aria-hidden="true"></i></span><span>Know what you're trying to do: not punish them, not forgive them, not settle the question. You're trying to get them to look at what happened clearly.</span></div>
-          <div class="fpSignal"><span class="fpSignalIcon"><i class="ph-bold ph-shield" aria-hidden="true"></i></span><span>You can be on their side as a person while not being on their side about this specific behaviour. Those aren't the same thing.</span></div>
+        <div class="note" style="margin:0 0 14px;">
+          <b>Before you start:</b> Have this conversation when you're both sober, alone, and calm. Not in a group, not over text, not when you're angry. Private + calm is the only way this works.
         </div>
 
-        <div class="fpStepHead">What to say — and what to avoid</div>
-        <div class="fpConvoCards" id="fpTalkCards">
-          <div class="fpConvoCard">
-            <div class="fpConvoCardHead">
-              <span>"I need to talk to you about what happened with [person]."</span>
-              <span class="fpConvoCardTag fpTagSay">Try this</span>
-              <span class="fpConvoChev">▾</span>
+        <!-- Contained 4-step widget — dots + sliding panels in one framed window -->
+        <div class="fpTalkWindow" id="fpTalkWindow">
+          <div class="fpTalkSteps" id="fpTalkSteps" role="tablist" aria-label="Conversation steps">
+            <div class="fpTalkStep active" data-step="1">
+              <div class="fpTalkStepDot">1</div>
+              <div class="fpTalkStepLabel">Open it</div>
             </div>
-            <div class="fpConvoBody">
-              Start direct. Building up with small talk makes the moment more awkward, not less, and it tells your friend you’re anxious about saying it. Say it plainly — not as an accusation, but as something you can’t pretend you haven’t noticed.
+            <div class="fpTalkStep" data-step="2">
+              <div class="fpTalkStepDot">2</div>
+              <div class="fpTalkStepLabel">Name it</div>
             </div>
-          </div>
-          <div class="fpConvoCard">
-            <div class="fpConvoCardHead">
-              <span>"I'm not here to judge you — I want to understand what happened."</span>
-              <span class="fpConvoCardTag fpTagSay">Try this</span>
-              <span class="fpConvoChev">▾</span>
+            <div class="fpTalkStep" data-step="3">
+              <div class="fpTalkStepDot">3</div>
+              <div class="fpTalkStepLabel">Ask it</div>
             </div>
-            <div class="fpConvoBody">
-              This framing keeps them from going defensive immediately. Most people shut down when they feel attacked. Curiosity opens more than accusation. Ask them to walk you through it from their side — and genuinely listen.
+            <div class="fpTalkStep" data-step="4">
+              <div class="fpTalkStepDot">4</div>
+              <div class="fpTalkStepLabel">Hold it</div>
             </div>
           </div>
-          <div class="fpConvoCard">
-            <div class="fpConvoCardHead">
-              <span>"Have you thought about how [person] experienced that?"</span>
-              <span class="fpConvoCardTag fpTagSay">Try this</span>
-              <span class="fpConvoChev">▾</span>
-            </div>
-            <div class="fpConvoBody">
-              This is the pivot question. Most people in this situation have only thought about their own experience, intentions, and feelings. This question asks them to step into the other person's shoes — and it often lands like a small earthquake when asked by someone they trust.
-            </div>
+
+          <div class="fpTalkViewport" id="fpTalkViewport">
+            <div class="fpTalkTrack" id="fpTalkTrack">
+
+        <!-- Step 1: Opening -->
+        <div class="fpTalkPanel" data-panel="1" id="fpTalkPanel1" role="tabpanel" aria-label="Step 1: opening the conversation">
+          <div class="fpTalkPanelTitle">1 · Open the conversation</div>
+          <div class="fpTalkPanelLead">Start direct, but not loaded. The first sentence sets whether they listen or shut down.</div>
+
+          <div class="fpTalkScript">
+            <div class="fpTalkScriptLabel">Try saying:</div>
+            <div class="fpTalkScriptText">"Hey — I want to talk to you about something hard. Can we?"</div>
           </div>
-          <div class="fpConvoCard">
-            <div class="fpConvoCardHead">
-              <span>"She was into it / She didn't say no / Nothing happened"</span>
-              <span class="fpConvoCardTag fpTagAvoid">Don't accept this</span>
-              <span class="fpConvoChev">▾</span>
-            </div>
-            <div class="fpConvoBody">
-              These are deflections, not explanations. You don't have to argue with them — just don't let it close the conversation.
-              Try: "Maybe — but I still want you to think about how they experienced it, not just how you did."
-              You're not demanding a confession. You're asking for reflection.
-            </div>
+
+          <div class="fpTalkWhy">
+            <div class="fpTalkWhyLabel">Why this works</div>
+            <div class="fpTalkWhyText">You're signaling weight without ambushing them. Asking "can we?" gives them a tiny bit of agency, which makes them more likely to actually engage instead of getting defensive before you've said anything substantive. It also tells them this isn't small talk — they should put their phone down.</div>
           </div>
-          <div class="fpConvoCard">
-            <div class="fpConvoCardHead">
-              <span>"I think you should talk to someone about this."</span>
-              <span class="fpConvoCardTag fpTagBoth">When to say this</span>
-              <span class="fpConvoChev">▾</span>
-            </div>
-            <div class="fpConvoBody">
-              If what you heard was serious — if real harm occurred — the conversation with you is a starting point, not a finish line. Point them toward a counsellor, a trusted adult, or this tool.
-              You can say: "I care about you too much to pretend this doesn't need more than just a talk between us."
-            </div>
+
+          <div class="fpTalkAvoid">
+            <div class="fpTalkAvoidLabel">Don't open with</div>
+            <div class="fpTalkAvoidText">"We need to talk." "What did you do?" "I heard something about you." Any of these pre-loads accusation. They'll be defending themselves before you've even told them what this is about.</div>
+          </div>
+
+          <div class="fpTalkNav">
+            <button class="btn btnPrimary" data-fp-talk-next="2">Next: Name what you've noticed →</button>
           </div>
         </div>
 
-        <div class="grid" style="margin-top:16px;">
-          <button class="btn btnPrimary" data-action="fp_enabling">What if I'm enabling instead of helping?</button>
+        <!-- Step 2: What you've noticed -->
+        <div class="fpTalkPanel" data-panel="2" id="fpTalkPanel2" role="tabpanel" aria-label="Step 2: what you've noticed">
+          <div class="fpTalkPanelTitle">2 · Name what you've noticed</div>
+          <div class="fpTalkPanelLead">One sentence. A statement, not an accusation. The smaller and more specific, the harder it is to dismiss.</div>
+
+          <div class="fpTalkScript">
+            <div class="fpTalkScriptLabel">Try saying:</div>
+            <div class="fpTalkScriptText">"What you said about [person] at [where/when] has been on my mind. The way you described it didn't sit right with me."</div>
+          </div>
+
+          <div class="fpTalkWhy">
+            <div class="fpTalkWhyLabel">Why this works</div>
+            <div class="fpTalkWhyText">You're describing your own observation, not delivering a verdict on them. "It hasn't sat right with me" is a feeling — they can't argue with your feeling the way they can argue with a label. And by anchoring to a specific moment, you stop them from making this an abstract debate.</div>
+          </div>
+
+          <div class="fpTalkAvoid">
+            <div class="fpTalkAvoidLabel">Don't say</div>
+            <div class="fpTalkAvoidText">"You assaulted her." "What you did is rape." "You're a predator." Even if those words turn out to be accurate, leading with them ends the conversation. You're not the prosecutor — you're someone who knows them and is trying to get them to look honestly.</div>
+          </div>
+
+          <div class="fpTalkNav">
+            <button class="btn" data-fp-talk-next="1">← Back</button>
+            <button class="btn btnPrimary" data-fp-talk-next="3">Next: Ask what you're asking →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: What you're asking -->
+        <div class="fpTalkPanel" data-panel="3" id="fpTalkPanel3" role="tabpanel" aria-label="Step 3: what you're asking">
+          <div class="fpTalkPanelTitle">3 · Ask what you're actually asking</div>
+          <div class="fpTalkPanelLead">You're not asking them to confess. You're not asking them to stop being your friend. You're asking them to <em>think about it</em>. That's a much smaller ask — and a much more honest one.</div>
+
+          <div class="fpTalkScript">
+            <div class="fpTalkScriptLabel">Try saying:</div>
+            <div class="fpTalkScriptText">"I'm not asking you to agree with me. I'm asking you to actually think about how they experienced that — not just how you did."</div>
+          </div>
+
+          <div class="fpTalkWhy">
+            <div class="fpTalkWhyLabel">Why this works</div>
+            <div class="fpTalkWhyText">Most people who have caused harm have only replayed the moment from their own POV. Asking them to step into the other person's experience is the single highest-leverage move you can make in this conversation. It's also small enough that they can't refuse without looking obviously closed-off.</div>
+          </div>
+
+          <div class="fpTalkAvoid">
+            <div class="fpTalkAvoidLabel">Don't demand</div>
+            <div class="fpTalkAvoidText">"You need to apologize right now." "Tell me you understand it was wrong." "Promise me you'll never do this again." Demands turn this into a power struggle. Reflection is what changes behavior — not coerced agreement.</div>
+          </div>
+
+          <div class="fpTalkNav">
+            <button class="btn" data-fp-talk-next="2">← Back</button>
+            <button class="btn btnPrimary" data-fp-talk-next="4">Next: When they push back →</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Push-back -->
+        <div class="fpTalkPanel" data-panel="4" id="fpTalkPanel4" role="tabpanel" aria-label="Step 4: holding the line when they push back">
+          <div class="fpTalkPanelTitle">4 · Hold the line when they push back</div>
+          <div class="fpTalkPanelLead">Three things they're most likely to say. For each one — a rehearsed line you can use without having to think on your feet.</div>
+
+          <div class="fpTalkRebuttal" data-rebuttal="0">
+            <div class="fpTalkRebuttalHead" role="button" tabindex="0" aria-expanded="false">
+              <span>"You don't know what you're talking about."</span>
+              <span class="fpConvoChev" aria-hidden="true">▾</span>
+            </div>
+            <div class="fpTalkRebuttalBody">
+              <div class="fpTalkRebuttalScript">
+                <b>Say:</b> "You're right that I wasn't there. I'm not telling you what happened — I'm telling you what I noticed and how it landed. I'd rather hear it from you than keep wondering."
+              </div>
+              <div class="fpTalkRebuttalNote">You're not claiming to have witnessed it. You're claiming the right to ask. Conceding their point ("you weren't there") without conceding the conversation is the move. It also opens the door for them to tell you their version — which, if they actually walk through it, is often where reflection starts.</div>
+            </div>
+          </div>
+
+          <div class="fpTalkRebuttal" data-rebuttal="1">
+            <div class="fpTalkRebuttalHead" role="button" tabindex="0" aria-expanded="false">
+              <span>"They wanted it. / They didn't say no. / Nothing actually happened."</span>
+              <span class="fpConvoChev" aria-hidden="true">▾</span>
+            </div>
+            <div class="fpTalkRebuttalBody">
+              <div class="fpTalkRebuttalScript">
+                <b>Say:</b> "Maybe — and I still want you to think about it from their side. People can not-say-no for a lot of reasons. The question isn't whether they fought you. The question is whether they were actually into it."
+              </div>
+              <div class="fpTalkRebuttalNote">Don't argue the facts — you'll lose, because you can't prove what was in someone else's head. Instead, redirect to the standard. "Did they say no" is the wrong question. "Were they actually into it" is the right one, and most people, when asked it sincerely, find the honest answer is uncomfortable.</div>
+            </div>
+          </div>
+
+          <div class="fpTalkRebuttal" data-rebuttal="2">
+            <div class="fpTalkRebuttalHead" role="button" tabindex="0" aria-expanded="false">
+              <span>"Stay out of it. / This isn't your business. / You're being a buzzkill."</span>
+              <span class="fpConvoChev" aria-hidden="true">▾</span>
+            </div>
+            <div class="fpTalkRebuttalBody">
+              <div class="fpTalkRebuttalScript">
+                <b>Say:</b> "I care about you too much to pretend I didn't notice. If our friendship can't hold one honest conversation, it isn't actually that strong. I'm not going anywhere — I just need you to take this seriously."
+              </div>
+              <div class="fpTalkRebuttalNote">This rebuttal is a test. They're seeing whether your discomfort will outweigh your concern. The answer needs to be no. Naming that you're choosing the friendship by having this conversation — not in spite of it — flips the dynamic. The people who care most are the ones who say the hard thing.</div>
+            </div>
+          </div>
+
+          <div class="note" style="margin-top:14px;">
+            <b>If they get angry, threaten the friendship, or storm out:</b> let them. You did your part. Don't chase, don't apologize for bringing it up, don't soften your line later by text. Someone reacting badly to a fair question is information about them, not about whether the question was fair.
+          </div>
+
+          <!-- Share this tool (B17) -->
+          <div class="shareToolWrap" id="fpTalkShareWrap">
+            <div class="shareToolLabel">If it helps</div>
+            <div class="shareToolHeadline">Share Vibe Check with your friend</div>
+            <div class="shareToolSub">If the conversation went somewhere — or if you'd rather they read through this themselves — you can send them the tool. It's free, private, and they don't have to tell anyone they used it.</div>
+            <div class="shareToolRow">
+              <button class="btn btnPrimary" id="fpTalkShareBtn" type="button"><i class="ph-bold ph-share-network" aria-hidden="true"></i> Share</button>
+              <button class="btn" id="fpTalkCopyBtn" type="button"><i class="ph-bold ph-copy" aria-hidden="true"></i> Copy link</button>
+            </div>
+            <div class="shareToolConfirm" id="fpTalkShareConfirm" role="status" aria-live="polite">✓ Link copied</div>
+          </div>
+
+          <div class="fpTalkNav">
+            <button class="btn" data-fp-talk-next="3">← Back</button>
+            <button class="btn btnPrimary" data-action="fp_bystander_scripts">More tough reactions →</button>
+          </div>
+        </div>
+            </div><!-- /fpTalkTrack -->
+          </div><!-- /fpTalkViewport -->
+        </div><!-- /fpTalkWindow -->
+
+        <!-- Always-visible navigation, outside the carousel widget -->
+        <div class="grid" style="margin-top:18px;">
+          <button class="btn" data-action="fp_enabling">What if I'm enabling instead of helping?</button>
           <button class="btn" data-action="fp_support_affected">I also want to support the person who was affected</button>
-          <button class="btn" data-action="nextSteps">Go to next steps & resources</button>
+          <button class="btn" data-action="nextSteps">Go to next steps &amp; resources</button>
         </div>
       </div>
     `;
+
+    // --- Step navigation (carousel: slides within a contained widget) ---
     setTimeout(function(){
-      document.querySelectorAll('#fpTalkCards .fpConvoCardHead').forEach(function(h){
-        h.addEventListener('click', function(){
-          h.closest('.fpConvoCard').classList.toggle('open');
+      const stepNodes = Array.from(document.querySelectorAll('#fpTalkSteps .fpTalkStep'));
+      const panels    = Array.from(document.querySelectorAll('#fpTalkTrack .fpTalkPanel'));
+      const track     = document.getElementById('fpTalkTrack');
+      const viewport  = document.getElementById('fpTalkViewport');
+      let currentStep = 1;
+
+      // Keep viewport height equal to the currently visible panel — animates smoothly,
+      // and adapts when rebuttals open/close inside step 4.
+      function refreshHeight(){
+        const p = panels[currentStep - 1];
+        if(viewport && p){ viewport.style.height = p.offsetHeight + 'px'; }
+      }
+
+      function showStep(n){
+        n = Math.max(1, Math.min(panels.length, parseInt(n, 10) || 1));
+        currentStep = n;
+        // Update dots
+        stepNodes.forEach(function(node){
+          const s = parseInt(node.dataset.step, 10);
+          node.classList.toggle('active', s === n);
+          node.classList.toggle('done', s < n);
         });
+        // Slide the track horizontally (each panel = 25% of track width)
+        if(track){
+          track.style.transform = 'translateX(-' + ((n - 1) * 25) + '%)';
+        }
+        // Mark inactive panels inert + aria-hidden so keyboard/screen readers skip them
+        panels.forEach(function(p, idx){
+          const isActive = (idx + 1) === n;
+          if(isActive){
+            p.removeAttribute('inert');
+            p.setAttribute('aria-hidden','false');
+            // Subtle fade-in on the content as the slide settles
+            p.classList.remove('fpTalkPanelFade');
+            void p.offsetWidth;
+            p.classList.add('fpTalkPanelFade');
+          } else {
+            p.setAttribute('inert','');
+            p.setAttribute('aria-hidden','true');
+          }
+        });
+        refreshHeight();
+      }
+
+      // Wire up next/back buttons inside panels
+      document.querySelectorAll('[data-fp-talk-next]').forEach(function(btn){
+        btn.addEventListener('click', function(){ showStep(btn.getAttribute('data-fp-talk-next')); });
       });
+      // Step dots also navigate
+      stepNodes.forEach(function(node){
+        node.style.cursor = 'pointer';
+        node.setAttribute('tabindex', '0');
+        node.setAttribute('role', 'button');
+        node.setAttribute('aria-label', 'Go to step ' + node.dataset.step);
+        function gotoStep(){ showStep(node.dataset.step); }
+        node.addEventListener('click', gotoStep);
+        node.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); gotoStep(); }});
+      });
+      // Rebuttal expand/collapse — also refresh viewport height since panel content grows/shrinks
+      document.querySelectorAll('.fpTalkRebuttal').forEach(function(reb){
+        const head = reb.querySelector('.fpTalkRebuttalHead');
+        if(!head) return;
+        function toggle(){
+          const isOpen = reb.classList.toggle('open');
+          head.setAttribute('aria-expanded', String(isOpen));
+          // Wait for CSS transition height to settle before measuring
+          setTimeout(refreshHeight, 10);
+        }
+        head.addEventListener('click', toggle);
+        head.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); }});
+      });
+
+      // Initial render — set inert state and height for step 1
+      showStep(1);
+
+      // Re-measure once fonts + icons finish loading (Phosphor loads async from a CDN)
+      if(document && document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function'){
+        document.fonts.ready.then(refreshHeight).catch(function(){});
+      }
+      setTimeout(refreshHeight, 250);
+      setTimeout(refreshHeight, 900);
+
+      // Re-measure on window resize (font-clamps + flex widths can change panel height)
+      let resizeRaf = null;
+      window.addEventListener('resize', function(){
+        if(resizeRaf) cancelAnimationFrame(resizeRaf);
+        resizeRaf = requestAnimationFrame(refreshHeight);
+      });
+
+      // --- Share tool (B17) — robust: native share → clipboard API → execCommand → URL prompt ---
+      const fpShareBtn = document.getElementById('fpTalkShareBtn');
+      const fpCopyBtn  = document.getElementById('fpTalkCopyBtn');
+      const fpShareConfirm = document.getElementById('fpTalkShareConfirm');
+      if(fpShareBtn){ fpShareBtn.addEventListener('click', function(){ vcShareTool(fpShareConfirm); }); }
+      if(fpCopyBtn){ fpCopyBtn.addEventListener('click',  function(){ vcCopyLink(fpShareConfirm); }); }
     }, 0);
+
     actions.fp_enabling = ()=>go("fp_enabling");
     actions.fp_support_affected = ()=>go("fp_support_affected");
+    actions.fp_bystander_scripts = ()=>go("fp_bystander_scripts");
     actions.nextSteps = ()=>go("nextSteps");
     return;
   }
@@ -12118,6 +12866,195 @@ function render(){
         });
       });
     }, 0);
+    actions.fp_support_affected = ()=>go("fp_support_affected");
+    actions.nextSteps = ()=>go("nextSteps");
+    return;
+  }
+
+  if(id==="fp_bystander_scripts"){
+    screen.innerHTML = backBtn() + `
+      <div class="card">
+        <div class="h1">When they push back — what to say</div>
+        <div class="p">You said the hard thing. Now they're reacting. Most people, when their behaviour gets named, will not respond with "you're right, thank you." Here's how to hold the line through the five most common reactions — without ending the conversation and without backing down.</div>
+
+        <div class="bysHeroNote">
+          <b>Read these before the conversation, not during it.</b> The point isn't to memorize — it's so when their reaction lands, you have somewhere to go besides freezing or escalating.
+        </div>
+
+        <div class="bysIntro">How they're likely to react</div>
+        <div class="bysScriptList" id="bysScriptList">
+
+          <!-- 1. They get angry -->
+          <div class="bysScript" data-bys="0">
+            <div class="bysScriptHead" role="button" tabindex="0" aria-expanded="false">
+              <span class="bysScriptIcon" aria-hidden="true"><i class="ph-bold ph-flame"></i></span>
+              <span class="bysScriptBlock">
+                <div class="bysScriptTitle">They get angry at you</div>
+                <div class="bysScriptSub">"Who the hell are you to say this to me?"</div>
+              </span>
+              <span class="fpConvoChev" aria-hidden="true">▾</span>
+            </div>
+            <div class="bysScriptBody">
+              <div class="bysSayBlock">
+                <div class="bysSayLabel">Say this</div>
+                <div class="bysSayText">"I'm not attacking you. I'm bringing this to you because I think you're capable of looking at it honestly. If I didn't, I wouldn't have said anything."</div>
+              </div>
+              <div class="bysSayBlock">
+                <div class="bysSayLabel">Or this</div>
+                <div class="bysSayText">"I get that this is hard to hear. I'd rather you be angry at me than I keep this to myself."</div>
+              </div>
+              <div class="bysDontBlock">
+                <div class="bysDontLabel">Don't say</div>
+                <div class="bysDontText">"Okay, forget I said anything." "Sorry I brought it up." Backpedalling teaches them that getting loud makes the conversation go away. It also tells them you didn't really mean it.</div>
+              </div>
+              <div class="bysWhyBlock">
+                <span class="bysWhyLabel">Why:</span>Anger here is almost always self-protection — a wall going up because something hit close. Naming that you came to them <em>because</em> you respect them flips the frame. You're treating them like someone capable of an honest look; that's actually flattering even when it lands hard.
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. They minimize -->
+          <div class="bysScript" data-bys="1">
+            <div class="bysScriptHead" role="button" tabindex="0" aria-expanded="false">
+              <span class="bysScriptIcon" aria-hidden="true"><i class="ph-bold ph-feather"></i></span>
+              <span class="bysScriptBlock">
+                <div class="bysScriptTitle">They minimize it</div>
+                <div class="bysScriptSub">"It wasn't that big a deal." "Everyone does that." "You're overreacting."</div>
+              </span>
+              <span class="fpConvoChev" aria-hidden="true">▾</span>
+            </div>
+            <div class="bysScriptBody">
+              <div class="bysSayBlock">
+                <div class="bysSayLabel">Say this</div>
+                <div class="bysSayText">"If it wasn't a big deal, it wouldn't still be sitting with me weeks later. And it wouldn't still be sitting with them either. Small things don't stick like this."</div>
+              </div>
+              <div class="bysSayBlock">
+                <div class="bysSayLabel">Or this</div>
+                <div class="bysSayText">"I'm not asking you to call it a crime. I'm asking you to not call it nothing."</div>
+              </div>
+              <div class="bysDontBlock">
+                <div class="bysDontLabel">Don't say</div>
+                <div class="bysDontText">"Maybe you're right, maybe I'm reading into it." Hedging now is conceding the entire ground you came in on. You can be uncertain about details and still certain something matters.</div>
+              </div>
+              <div class="bysWhyBlock">
+                <span class="bysWhyLabel">Why:</span>Minimizing is the most common reaction because it's the cheapest defence — it doesn't require denying anything, just shrinking it. Naming that "small things don't stick" reframes the size question without arguing the facts. The fact that you both keep thinking about it is the evidence.
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. They cut you off / shut you down -->
+          <div class="bysScript" data-bys="2">
+            <div class="bysScriptHead" role="button" tabindex="0" aria-expanded="false">
+              <span class="bysScriptIcon" aria-hidden="true"><i class="ph-bold ph-door-open"></i></span>
+              <span class="bysScriptBlock">
+                <div class="bysScriptTitle">They cut you off or shut you down</div>
+                <div class="bysScriptSub">"We're not talking about this." "End of conversation." Walks away.</div>
+              </span>
+              <span class="fpConvoChev" aria-hidden="true">▾</span>
+            </div>
+            <div class="bysScriptBody">
+              <div class="bysSayBlock">
+                <div class="bysSayLabel">If they're still in the room, say:</div>
+                <div class="bysSayText">"Okay — I'm not going to push it tonight. But I'm not pretending I didn't bring it up. I'd like to come back to this when you've had time."</div>
+              </div>
+              <div class="bysSayBlock">
+                <div class="bysSayLabel">If they walked out, text later:</div>
+                <div class="bysSayText">"I'm not trying to fight. I said what I said because I'm not willing to be the friend who pretends not to notice. The door's open whenever you want to actually talk."</div>
+              </div>
+              <div class="bysDontBlock">
+                <div class="bysDontLabel">Don't</div>
+                <div class="bysDontText">Send paragraphs. Apologize for raising it. Pretend it didn't happen the next time you see them. Each of those teaches them that the wall worked.</div>
+              </div>
+              <div class="bysWhyBlock">
+                <span class="bysWhyLabel">Why:</span>Shutting down is a test of whether you'll fold. The win isn't forcing a conversation right now — it's making clear that the topic exists and you're not going to act like it doesn't. Quiet, calm persistence over time outperforms one big confrontation.
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. They change the subject / make it about you -->
+          <div class="bysScript" data-bys="3">
+            <div class="bysScriptHead" role="button" tabindex="0" aria-expanded="false">
+              <span class="bysScriptIcon" aria-hidden="true"><i class="ph-bold ph-arrows-clockwise"></i></span>
+              <span class="bysScriptBlock">
+                <div class="bysScriptTitle">They change the subject or flip it on you</div>
+                <div class="bysScriptSub">"What about that thing you did?" "You're not exactly perfect either." "Why are you really bringing this up?"</div>
+              </span>
+              <span class="fpConvoChev" aria-hidden="true">▾</span>
+            </div>
+            <div class="bysScriptBody">
+              <div class="bysSayBlock">
+                <div class="bysSayLabel">Say this</div>
+                <div class="bysSayText">"You're right that I'm not perfect. We can talk about my stuff anytime. But that's a separate conversation — and it doesn't change the one we're in right now."</div>
+              </div>
+              <div class="bysSayBlock">
+                <div class="bysSayLabel">Or this</div>
+                <div class="bysSayText">"I'm bringing it up because I noticed it. That's the whole reason. There isn't a secret one."</div>
+              </div>
+              <div class="bysDontBlock">
+                <div class="bysDontLabel">Don't say</div>
+                <div class="bysDontText">"Forget my stuff — that's not what we're talking about." Dismissing their counter-point gives them an exit ramp. Acknowledge it, then pull the conversation back to where you started.</div>
+              </div>
+              <div class="bysWhyBlock">
+                <span class="bysWhyLabel">Why:</span>Subject-flipping is a deflection that works only if you let it. Briefly acknowledging "yes, we can talk about that later" honors the point without conceding the floor. The phrase "that doesn't change this conversation" is the line that holds the room.
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. They threaten the friendship -->
+          <div class="bysScript" data-bys="4">
+            <div class="bysScriptHead" role="button" tabindex="0" aria-expanded="false">
+              <span class="bysScriptIcon" aria-hidden="true"><i class="ph-bold ph-sword"></i></span>
+              <span class="bysScriptBlock">
+                <div class="bysScriptTitle">They threaten the friendship</div>
+                <div class="bysScriptSub">"If you really were my friend, you wouldn't say this." "I can't believe you're choosing them over me."</div>
+              </span>
+              <span class="fpConvoChev" aria-hidden="true">▾</span>
+            </div>
+            <div class="bysScriptBody">
+              <div class="bysSayBlock">
+                <div class="bysSayLabel">Say this</div>
+                <div class="bysSayText">"I'm not choosing them over you. I'm choosing both of you — and choosing the kind of friend who tells the truth instead of the kind who covers for you."</div>
+              </div>
+              <div class="bysSayBlock">
+                <div class="bysSayLabel">Or this</div>
+                <div class="bysSayText">"A friendship that can't survive one honest conversation isn't actually that strong. I'm betting it's stronger than that."</div>
+              </div>
+              <div class="bysDontBlock">
+                <div class="bysDontLabel">Don't do</div>
+                <div class="bysDontText">Soften the line by saying "fine, forget it, we're cool." That confirms that the threat worked. If they actually end the friendship over you naming something true, that's information — painful, but real.</div>
+              </div>
+              <div class="bysWhyBlock">
+                <span class="bysWhyLabel">Why:</span>This rebuttal is the one most likely to make you fold, because it costs you directly. Name what you're actually doing: you're choosing a different kind of friendship — one where honesty doesn't end relationships. People who care about you will ultimately respect that, even if they hate it in the moment.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="note" style="margin-top:6px;">
+          <b>One thing worth remembering:</b> The point of these scripts isn't to win. It's to plant a question they can't unhear. Most behaviour change after a confrontation like this happens days or weeks later, alone, when they're replaying the conversation in their head. Your job is to make sure the conversation is one they can replay — not one they can dismiss.
+        </div>
+
+        <div class="grid" style="margin-top:14px;">
+          <button class="btn btnPrimary" data-action="fp_enabling">What if I'm enabling instead of helping?</button>
+          <button class="btn" data-action="fp_support_affected">Supporting the person who was affected</button>
+          <button class="btn" data-action="nextSteps">Go to next steps &amp; resources</button>
+        </div>
+      </div>
+    `;
+    setTimeout(function(){
+      document.querySelectorAll('#bysScriptList .bysScript').forEach(function(el){
+        const head = el.querySelector('.bysScriptHead');
+        if(!head) return;
+        function toggle(){
+          const isOpen = el.classList.toggle('open');
+          head.setAttribute('aria-expanded', String(isOpen));
+        }
+        head.addEventListener('click', toggle);
+        head.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); }});
+      });
+    }, 0);
+    actions.fp_enabling = ()=>go("fp_enabling");
     actions.fp_support_affected = ()=>go("fp_support_affected");
     actions.nextSteps = ()=>go("nextSteps");
     return;
@@ -17880,6 +18817,18 @@ if(state.emotion==="okay"){
           </div>
         </div>
 
+        <!-- Share this tool (B17) -->
+        <div class="shareToolWrap" id="closingShareWrap">
+          <div class="shareToolLabel">If it’s helpful</div>
+          <div class="shareToolHeadline">Share Vibe Check with someone who might need it</div>
+          <div class="shareToolSub">If this tool was useful — pass it on. It’s free, private, and there’s no account or sign-up necessary.</div>
+          <div class="shareToolRow">
+            <button class="btn btnPrimary" id="closingShareBtn" type="button"><i class="ph-bold ph-share-network" aria-hidden="true"></i> Share</button>
+            <button class="btn" id="closingCopyBtn" type="button"><i class="ph-bold ph-copy" aria-hidden="true"></i> Copy link</button>
+          </div>
+          <div class="shareToolConfirm" id="closingShareConfirm" role="status" aria-live="polite">✓ Link copied</div>
+        </div>
+
         <div style="display:grid; gap:10px; margin-top:16px;">
           ${btn("Start over","restart","btn btnPrimary")}
         </div>
@@ -17928,6 +18877,15 @@ if(state.emotion==="okay"){
       forgeInput.disabled = true;
       forgeInput.style.opacity = '.55';
     });
+
+    // --- Share this tool (B17) \u2014 robust: native share \u2192 clipboard API \u2192 execCommand \u2192 URL prompt ---
+    (function(){
+      const shareBtn = document.getElementById('closingShareBtn');
+      const copyBtn  = document.getElementById('closingCopyBtn');
+      const confirm  = document.getElementById('closingShareConfirm');
+      if(shareBtn){ shareBtn.addEventListener('click', function(){ vcShareTool(confirm); }); }
+      if(copyBtn){  copyBtn.addEventListener('click',  function(){ vcCopyLink(confirm); }); }
+    })();
 
     actions.restart=()=>reset();
     return;
@@ -22661,6 +23619,11 @@ const VC_SEARCH_INDEX = {"landing": {"t": "Vibe Check — Home", "tag": "", "b":
       t: 'I know what I did was wrong — and I want to make it right',
       tag: 'entry pathway start doorway',
       b: 'know what i did was wrong want to take accountability take responsibility taking accountability make it right repair what i did i hurt someone i need to make amends own up to it i did something wrong and i want to fix it want to take accountability for what i did acknowledge what i did'
+    },
+    'fp_bystander_scripts': {
+      t: 'When they push back — what to say',
+      tag: 'friend pathway confrontation script',
+      b: 'how to confront a friend friend got angry friend minimized friend cut me off friend changed the subject friend threatened the friendship friend got defensive what to say if my friend gets angry what to say if my friend denies it friend said i was overreacting friend said stay out of it script for confronting a friend rehearsed lines tough reactions push back pushback'
     }
   };
 
