@@ -3346,6 +3346,7 @@
 /* ===== Country toggle (US / Canada) on support page ===== */
 .countryToggle {
   display: inline-flex;
+  flex-wrap: wrap;
   background: rgba(255,255,255,.04);
   border: 1px solid rgba(209,254,255,.16);
   border-radius: 999px;
@@ -7187,6 +7188,25 @@ function triggerTransition(){
 }
 function reset(){ state.entry=null; state.scenario=null; state.emotion=null; state.path=null; state.history=[]; state.pathwayCompleted=false; state.visitedTools=[]; go("landing"); }
 
+/* ---- GoatCounter custom-event helper -------------------------------------
+   Fires one aggregate event to the SEPARATE vibe-events GoatCounter site so
+   it doesn't inflate the main site's page-visit counts. Same fire-and-forget
+   GET that count.js uses under the hood — no identifiers, no cookies. Shared
+   by the data-action click tracker below and by the standalone trackers
+   (Forge It button, support resource links). */
+const GC_EVENTS_ENDPOINT = "https://vibe-events.goatcounter.com/count";
+function gcEvent(evt, ttl){
+  try{
+    const url = GC_EVENTS_ENDPOINT
+      + "?p="   + encodeURIComponent(evt)
+      + "&t="   + encodeURIComponent((ttl || evt).slice(0, 100))
+      + "&e=true"
+      + "&rnd=" + Math.random().toString(36).slice(2);
+    new Image(1,1).src = url;
+    console.log("[gc] tracked:", evt);
+  }catch(err){ console.warn("[gc] tracking error:", err); }
+}
+
 document.addEventListener("click", (e)=>{
   /* data-action navigation buttons */
   const el = e.target.closest("[data-action]");
@@ -7238,18 +7258,42 @@ document.addEventListener("click", (e)=>{
         boundaryFlags:        { evt: "tool-boundary-flags-click",             ttl: "Tool: Boundary Flags Game clicked" },
         angerFunnel:          { evt: "tool-anger-funnel-click",               ttl: "Tool: The Anger Funnel clicked" },
         thoughtRecord:        { evt: "tool-thought-record-click",             ttl: "Tool: Thought Record clicked" },
-        rejection:            { evt: "tool-rejection-click",                  ttl: "Tool: Understanding Rejection clicked" }
+        rejection:            { evt: "tool-rejection-click",                  ttl: "Tool: Understanding Rejection clicked" },
+
+        // Scenario picker (topScenario) — "Which feels closest to what happened?"
+        s1:                   { evt: "scenario-freeze-click",                 ttl: "Scenario: They froze or got quiet clicked" },
+        s2:                   { evt: "scenario-pulled-away-click",            ttl: "Scenario: They pulled away clicked" },
+        s3:                   { evt: "scenario-drinking-click",               ttl: "Scenario: We were drinking or using substances clicked" },
+        s4:                   { evt: "scenario-not-sure-wanted-click",        ttl: "Scenario: I'm not sure they really wanted it clicked" },
+        s5:                   { evt: "scenario-upset-after-click",            ttl: "Scenario: They seemed upset or distant afterward clicked" },
+        s6:                   { evt: "scenario-not-sure-what-click",          ttl: "Scenario: I'm still not sure what happened clicked" },
+        s7:                   { evt: "scenario-pressure-click",               ttl: "Scenario: I kept persuading or pressuring them clicked" },
+        s8:                   { evt: "scenario-age-power-click",              ttl: "Scenario: There was an age or power difference clicked" },
+        s9:                   { evt: "scenario-digital-click",                ttl: "Scenario: Something happened digitally clicked" },
+        s10:                  { evt: "scenario-coercion-click",               ttl: "Scenario: I ignored a clear no clicked" },
+        s11:                  { evt: "scenario-relationship-click",           ttl: "Scenario: We were in a relationship and I assumed consent clicked" },
+        s12:                  { evt: "scenario-asleep-click",                 ttl: "Scenario: They were asleep or half-asleep clicked" },
+        s13:                  { evt: "scenario-escalation-click",             ttl: "Scenario: Things escalated beyond what was agreed clicked" },
+        s14:                  { evt: "scenario-regret-click",                 ttl: "Scenario: They said they regret what happened clicked" },
+        s15:                  { evt: "scenario-comment-joke-click",           ttl: "Scenario: I made a comment, joke, or remark clicked" },
+
+        // Emotion check-in — "What are you feeling right now?"
+        guilt:                { evt: "emotion-guilt-click",                   ttl: "Emotion: Guilt selected" },
+        defensive:            { evt: "emotion-defensive-click",               ttl: "Emotion: Defensive selected" },
+        confused:             { evt: "emotion-confused-click",                ttl: "Emotion: Confused / Unsure selected" },
+        ashamed:              { evt: "emotion-ashamed-click",                 ttl: "Emotion: Ashamed selected" },
+        anxious:              { evt: "emotion-anxious-click",                 ttl: "Emotion: Anxious / Panicking selected" },
+        angry:                { evt: "emotion-angry-click",                   ttl: "Emotion: Angry selected" },
+        numb:                 { evt: "emotion-numb-click",                    ttl: "Emotion: Numb / Shut Down selected" },
+        sad:                  { evt: "emotion-sad-click",                     ttl: "Emotion: Sad selected" },
+        embarrassed:          { evt: "emotion-embarrassed-click",             ttl: "Emotion: Embarrassed selected" },
+        okay:                 { evt: "emotion-okay-click",                    ttl: "Emotion: Okay / Alright selected" },
+        relieved:             { evt: "emotion-relieved-click",                ttl: "Emotion: Relieved selected" },
+        unsure:               { evt: "emotion-something-else-click",          ttl: "Emotion: Something else / not sure selected" }
       };
-      const GC_EVENTS_ENDPOINT = "https://vibe-events.goatcounter.com/count";
       if(Object.prototype.hasOwnProperty.call(GC_EVENTS, a)){
         const { evt, ttl } = GC_EVENTS[a];
-        const url = GC_EVENTS_ENDPOINT
-          + "?p="   + encodeURIComponent(evt)
-          + "&t="   + encodeURIComponent(ttl)
-          + "&e=true"
-          + "&rnd=" + Math.random().toString(36).slice(2);
-        new Image(1,1).src = url;
-        console.log("[gc] tracked:", evt);
+        gcEvent(evt, ttl);
       }
     }catch(err){ console.warn("[gc] tracking error:", err); }
     actions[a]?.();
@@ -19537,24 +19581,30 @@ if(state.emotion==="okay"){
     const supIntro = subPageIntro("support");
 
     // Region-specific support resources. SafeBAE is an online program so it's
-    // shown for both regions; the rest swap to country-appropriate hotlines.
+    // shown for all regions; the rest swap to country-appropriate hotlines.
     const supportResources = {
       US: [
-        { url:'https://learning.safebae.org/accountability-training-0', icon:'ph-graduation-cap', label:'SafeBAE Accountability Training', sub:'Structured program for behavior change' },
-        { url:'https://rainn.org/', icon:'ph-hands-praying', label:'RAINN', sub:'National sexual assault hotline &amp; resources' },
-        { url:'https://988lifeline.org/', icon:'ph-phone', label:'988 Lifeline', sub:'Call or text 988 for mental health crisis support' },
-        { url:'https://www.crisistextline.org/', icon:'ph-chat-circle-dots', label:'Crisis Text Line', sub:'Text HOME to 741741 for free crisis counseling' }
+        { url:'https://learning.safebae.org/accountability-training-0', icon:'ph-graduation-cap', label:'SafeBAE Accountability Training', sub:'Structured program for behavior change', gc:'support-safebae-training' },
+        { url:'https://rainn.org/', icon:'ph-hands-praying', label:'RAINN', sub:'National sexual assault hotline &amp; resources', gc:'support-rainn' },
+        { url:'https://988lifeline.org/', icon:'ph-phone', label:'988 Lifeline', sub:'Call or text 988 for mental health crisis support', gc:'support-988-lifeline-us' },
+        { url:'https://www.crisistextline.org/', icon:'ph-chat-circle-dots', label:'Crisis Text Line', sub:'Text HOME to 741741 for free crisis counseling', gc:'support-crisis-text-line' }
       ],
       CA: [
-        { url:'https://learning.safebae.org/accountability-training-0', icon:'ph-graduation-cap', label:'SafeBAE Accountability Training', sub:'Structured program for behavior change' },
-        { url:'https://endingviolencecanada.org/sexual-assault-centres-crisis-lines-and-support-services/', icon:'ph-hands-praying', label:'Ending Violence Association of Canada', sub:'Directory of sexual assault centres &amp; crisis lines across Canada' },
-        { url:'https://988.ca/', icon:'ph-phone', label:'9-8-8 Suicide Crisis Helpline', sub:'Call or text 9-8-8 for free, 24/7 crisis support in English &amp; French' },
-        { url:'https://kidshelpphone.ca/', icon:'ph-chat-circle-dots', label:'Kids Help Phone', sub:'Text CONNECT to 686868 — free, 24/7 support (all ages welcome)' }
+        { url:'https://learning.safebae.org/accountability-training-0', icon:'ph-graduation-cap', label:'SafeBAE Accountability Training', sub:'Structured program for behavior change', gc:'support-safebae-training' },
+        { url:'https://endingviolencecanada.org/sexual-assault-centres-crisis-lines-and-support-services/', icon:'ph-hands-praying', label:'Ending Violence Association of Canada', sub:'Directory of sexual assault centres &amp; crisis lines across Canada', gc:'support-eva-canada' },
+        { url:'https://988.ca/', icon:'ph-phone', label:'9-8-8 Suicide Crisis Helpline', sub:'Call or text 9-8-8 for free, 24/7 crisis support in English &amp; French', gc:'support-988-helpline-ca' },
+        { url:'https://kidshelpphone.ca/', icon:'ph-chat-circle-dots', label:'Kids Help Phone', sub:'Text CONNECT to 686868 — free, 24/7 support (all ages welcome)', gc:'support-kids-help-phone' }
+      ],
+      UK: [
+        { url:'https://learning.safebae.org/accountability-training-0', icon:'ph-graduation-cap', label:'SafeBAE Accountability Training', sub:'Structured program for behavior change', gc:'support-safebae-training' },
+        { url:'https://rapecrisis.org.uk/', icon:'ph-hands-praying', label:'Rape Crisis England &amp; Wales', sub:'24/7 Rape &amp; Sexual Abuse Support Line — call 0808 500 2222', gc:'support-rape-crisis-ew' },
+        { url:'https://www.samaritans.org/', icon:'ph-phone', label:'Samaritans', sub:'Call 116 123 for free, 24/7 — for anything that’s upsetting you', gc:'support-samaritans' },
+        { url:'https://giveusashout.org/', icon:'ph-chat-circle-dots', label:'Shout', sub:'Text SHOUT to 85258 for free, 24/7 crisis support', gc:'support-shout' }
       ]
     };
 
     const renderSupportLinks = (country) => supportResources[country].map(r => `
-        <a class="supportLink" href="${r.url}" target="_blank" rel="noopener noreferrer">
+        <a class="supportLink" href="${r.url}" target="_blank" rel="noopener noreferrer" data-gc="${r.gc}" data-gc-ttl="Support: ${r.label} clicked">
           <span class="supportLinkIcon"><i class="ph-bold ${r.icon}"></i></span>
           <span class="supportLinkText">
             <span class="supportLinkLabel">${r.label}</span>
@@ -19568,7 +19618,7 @@ if(state.emotion==="okay"){
     let savedCountry = 'US';
     try {
       const s = sessionStorage.getItem('safebae:supportCountry');
-      if (s === 'US' || s === 'CA') savedCountry = s;
+      if (s === 'US' || s === 'CA' || s === 'UK') savedCountry = s;
     } catch(e){ /* ignore */ }
 
     screen.innerHTML = `<button class="btn btnBack" data-action="nextSteps">&#8592; Back</button>` + (supIntro ? personalNoteHtml(supIntro) : '') + card(
@@ -19581,6 +19631,7 @@ if(state.emotion==="okay"){
       `<div class="countryToggle" role="tablist" aria-label="Select country for support resources">
         <button class="countryToggleBtn ${savedCountry==='US'?'active':''}" data-country="US" type="button" role="tab" aria-selected="${savedCountry==='US'?'true':'false'}">United States</button>
         <button class="countryToggleBtn ${savedCountry==='CA'?'active':''}" data-country="CA" type="button" role="tab" aria-selected="${savedCountry==='CA'?'true':'false'}">Canada</button>
+        <button class="countryToggleBtn ${savedCountry==='UK'?'active':''}" data-country="UK" type="button" role="tab" aria-selected="${savedCountry==='UK'?'true':'false'}">United Kingdom</button>
       </div>
       <div id="supportLinksContainer" style="display:flex; flex-direction:column; gap:8px; margin-top:6px;">
         ${renderSupportLinks(savedCountry)}
@@ -19606,6 +19657,16 @@ if(state.emotion==="okay"){
         try { sessionStorage.setItem('safebae:supportCountry', country); } catch(e){ /* ignore */ }
       });
     });
+
+    // Track clicks on the support resource links. Delegated on the container
+    // so it keeps working after the country toggle re-renders the links
+    // (the toggle only swaps innerHTML — the container element persists).
+    if (linksContainer) {
+      linksContainer.addEventListener('click', (ev) => {
+        const link = ev.target.closest('a[data-gc]');
+        if (link) gcEvent(link.getAttribute('data-gc'), link.getAttribute('data-gc-ttl'));
+      });
+    }
 
     actions.nextSteps=()=>go("nextSteps");
     actions.closing=()=>go("closing");
@@ -19703,6 +19764,10 @@ if(state.emotion==="okay"){
     forgeBtn.addEventListener('click', ()=>{
       const text = forgeInput.value.trim();
       if(text.length < 5) return;
+
+      // Track that a commitment was forged (aggregate only — the text itself
+      // is never sent, it stays in the user's browser).
+      gcEvent("commitment-forged", "Closing: Commitment forged");
 
       // Show forged card
       cardText.textContent = '\u201C' + text + '\u201D';
@@ -24515,6 +24580,33 @@ const VC_SEARCH_INDEX = {"landing": {"t": "Vibe Check — Home", "tag": "", "b":
     };
   }
 
+  // ---------- Support-page resource terms ----------
+  // The auto-generated index captures the Support Options screen at build
+  // time, so it misses resources added later (the UK list) and drops bare
+  // digits like phone numbers. Append a complete, explicit set of search
+  // terms for every resource on that page — US, Canada, and UK — so queries
+  // for an org name or hotline number land here.
+  if (VC_SEARCH_INDEX.support) {
+    VC_SEARCH_INDEX.support.b = (VC_SEARCH_INDEX.support.b || '') +
+      // SafeBAE (shown for all regions)
+      ' safebae accountability training behavior change program' +
+      // United States
+      ' united states us america rainn national sexual assault hotline 1-800-656-4673' +
+      ' 988 988lifeline suicide and crisis lifeline mental health crisis' +
+      ' crisis text line text home to 741741 crisis counseling' +
+      // Canada
+      ' canada canadian ending violence association of canada sexual assault centres crisis lines directory' +
+      ' 988 9-8-8 suicide crisis helpline english french' +
+      ' kids help phone text connect to 686868 youth support' +
+      // United Kingdom
+      ' united kingdom uk britain british england wales scotland' +
+      ' rape crisis england and wales sexual abuse support line 0808 500 2222' +
+      ' samaritans call 116 123 someone to talk to anything upsetting you' +
+      ' shout text shout to 85258 crisis text service mental health' +
+      // generic intent words
+      ' helpline hotline crisis line support line talk to someone get help where to get help';
+  }
+
   // ---------- Pathway-entry keywords ----------
   // When a query term matches a pathway entry's keywords, that screen gets
   // a heavy boost — so the *doorway* to a topic outranks the deeper pages.
@@ -24557,7 +24649,7 @@ const VC_SEARCH_INDEX = {"landing": {"t": "Vibe Check — Home", "tag": "", "b":
     'signalBoard':           ['signals','signal','reading','cues'],
     // Resource & repair pages
     'nextSteps':             ['resources','hotline','help','hotlines','rainn','988'],
-    'support':               ['support','therapist','counselor','counseling','therapy'],
+    'support':               ['support','therapist','counselor','counseling','therapy','rainn','samaritans','shout','988','helpline','hotline'],
     'repair':                ['repair','apologize','apology','make','amends'],
     'closing':               ['finished','done','closing','complete','completed'],
     'shiftThinking':         ['shift','reframe','reframing'],
