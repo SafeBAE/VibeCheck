@@ -7213,15 +7213,18 @@ function triggerTransition(){
 function reset(){ state.entry=null; state.scenario=null; state.emotion=null; state.path=null; state.history=[]; state.pathwayCompleted=false; state.visitedTools=[]; go("landing"); }
 
 /* ---- GoatCounter custom-event helper -------------------------------------
-   Fires one aggregate event to the SEPARATE vibe-events GoatCounter site so
-   it doesn't inflate the main site's page-visit counts. Same fire-and-forget
-   GET that count.js uses under the hood — no identifiers, no cookies. Shared
-   by the data-action click tracker below and by the standalone trackers
-   (Forge It button, support resource links). */
+   Fires one aggregate event to a SEPARATE GoatCounter site so it doesn't
+   inflate the main site's page-visit counts. Defaults to the vibe-events
+   site; callers can pass their own endpoint (the dwell-time tracker sends to
+   its own dwell.goatcounter.com site). Same fire-and-forget GET that count.js
+   uses under the hood — no identifiers, no cookies. Shared by the data-action
+   click tracker below and by the standalone trackers (Forge It button,
+   support resource links). */
 const GC_EVENTS_ENDPOINT = "https://vibe-events.goatcounter.com/count";
-function gcEvent(evt, ttl){
+const GC_DWELL_ENDPOINT  = "https://dwell.goatcounter.com/count";
+function gcEvent(evt, ttl, endpoint){
   try{
-    const url = GC_EVENTS_ENDPOINT
+    const url = (endpoint || GC_EVENTS_ENDPOINT)
       + "?p="   + encodeURIComponent(evt)
       + "&t="   + encodeURIComponent((ttl || evt).slice(0, 100))
       + "&e=true"
@@ -7233,7 +7236,9 @@ function gcEvent(evt, ttl){
 
 /* ---- Dwell-time heartbeats -----------------------------------------------
    Fires one aggregate event each time a visitor's *active* time on Vibe Check
-   crosses a milestone (30s, 1m, 3m, 5m, 10m). Read together in GoatCounter
+   crosses a milestone (30s, 1m, 3m, 5m, 10m). These go to their own dedicated
+   GoatCounter site (dwell.goatcounter.com), kept separate from both the main
+   page-visit site and the vibe-events click site. Read together in GoatCounter
    these give a drop-off curve — e.g. how many people reach 5 minutes vs. just
    30 seconds. Time only accrues while the tab is visible, so a forgotten
    background tab doesn't inflate the numbers. Fully aggregate: no identifiers,
@@ -7259,7 +7264,7 @@ function gcEvent(evt, ttl){
     lastTick   = now;
     wasVisible = (document.visibilityState === "visible");
     while (nextIdx < MILESTONES.length && activeMs >= MILESTONES[nextIdx].ms) {
-      gcEvent(MILESTONES[nextIdx].evt, MILESTONES[nextIdx].ttl);
+      gcEvent(MILESTONES[nextIdx].evt, MILESTONES[nextIdx].ttl, GC_DWELL_ENDPOINT);
       nextIdx++;
     }
     if (nextIdx >= MILESTONES.length && timer) { clearInterval(timer); timer = null; }
