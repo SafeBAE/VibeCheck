@@ -1593,6 +1593,30 @@
       flex-direction: column;
       gap: 16px;
     }
+    /* Video embeds (responsive 16:9) */
+    .vcVideo {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      margin: 12px 0;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+    .vcVideo iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .vcVideoCaption {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+      margin: 2px 0 0;
+    }
     /* Consent cards */
     .dsConsentGrid {
       display: grid;
@@ -7206,6 +7230,46 @@ function gcEvent(evt, ttl){
     console.log("[gc] tracked:", evt);
   }catch(err){ console.warn("[gc] tracking error:", err); }
 }
+
+/* ---- Dwell-time heartbeats -----------------------------------------------
+   Fires one aggregate event each time a visitor's *active* time on Vibe Check
+   crosses a milestone (30s, 1m, 3m, 5m, 10m). Read together in GoatCounter
+   these give a drop-off curve — e.g. how many people reach 5 minutes vs. just
+   30 seconds. Time only accrues while the tab is visible, so a forgotten
+   background tab doesn't inflate the numbers. Fully aggregate: no identifiers,
+   no cookies — the same kind of ping as every other gcEvent. */
+(function(){
+  var MILESTONES = [
+    { ms: 30000,  evt: "dwell-30s",   ttl: "Dwell: reached 30 seconds" },
+    { ms: 60000,  evt: "dwell-1min",  ttl: "Dwell: reached 1 minute" },
+    { ms: 180000, evt: "dwell-3min",  ttl: "Dwell: reached 3 minutes" },
+    { ms: 300000, evt: "dwell-5min",  ttl: "Dwell: reached 5 minutes" },
+    { ms: 600000, evt: "dwell-10min", ttl: "Dwell: reached 10 minutes" }
+  ];
+  var activeMs   = 0;
+  var lastTick   = Date.now();
+  var wasVisible = (document.visibilityState === "visible");
+  var nextIdx    = 0;
+  var timer      = null;
+
+  function settle(){
+    var now = Date.now();
+    // Credit the just-elapsed interval only if the tab was visible during it.
+    if (wasVisible) activeMs += now - lastTick;
+    lastTick   = now;
+    wasVisible = (document.visibilityState === "visible");
+    while (nextIdx < MILESTONES.length && activeMs >= MILESTONES[nextIdx].ms) {
+      gcEvent(MILESTONES[nextIdx].evt, MILESTONES[nextIdx].ttl);
+      nextIdx++;
+    }
+    if (nextIdx >= MILESTONES.length && timer) { clearInterval(timer); timer = null; }
+  }
+
+  // Poll every 5s (cheap; self-cancels once the last milestone fires) and also
+  // settle on every visibility change so background time is excluded cleanly.
+  timer = setInterval(settle, 5000);
+  document.addEventListener("visibilitychange", settle);
+})();
 
 document.addEventListener("click", (e)=>{
   /* data-action navigation buttons */
@@ -20490,6 +20554,10 @@ function dsRender(){
       </div>`).join('');
     innerHTML = `
       <div class="p">Sending intimate images has become normalized — but the risks are real. This isn't about judgment. It's about making informed choices. <b>#KnowB4UNude</b></div>
+      <div class="vcVideo">
+        <iframe src="https://www.youtube.com/embed/iNAVcRO22S0" title="SafeBAE — #KnowB4UNude PSA" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+      <div class="vcVideoCaption">▶ SafeBAE's #KnowB4UNude PSA — the risks, pressures, and realities of sharing intimate images.</div>
       <div class="dsConsentGrid">${cards}</div>
       <div class="dsNavRow">
         <button class="btn" data-dsaction="back">← Back</button>
@@ -20787,6 +20855,11 @@ function myRender() {
       </div>`).join('');
     innerHTML = `
       <div class="p">Bro-code isn't just locker room talk. It's a set of unspoken rules that shape what men do, what they stay silent about, and what they cover for.</div>
+      <div class="p" style="color:var(--muted);">SafeBAE co-founder Charlie Coleman saw this play out firsthand — his sister Daisy was assaulted by boys he considered friends. In this video, made with Teen Vogue, he breaks down the everyday attitudes that let sexual violence continue. <b>Bystander failure is participation.</b></div>
+      <div class="vcVideo">
+        <iframe src="https://www.youtube.com/embed/FsmycfJPWs4" title="Charlie Coleman, SafeBAE co-founder" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+      <div class="vcVideoCaption">▶ Charlie Coleman, SafeBAE co-founder · Contains discussion of sexual assault — it's okay to take a break.</div>
       <div class="dsStepList">${broItems}</div>
       <div class="mutedBox" style="margin-top:10px;">When you can't be vulnerable with other men, feelings don't disappear — they build up and come out as something else. The cycle looks like this: suppress it → low self-worth → stuck → trauma → consequences → back to suppressing it.</div>
       <div class="note" style="border-color:rgba(21,255,200,.4);">Real loyalty isn't protecting someone from consequences. It's caring enough to tell them the truth. Those aren't the same thing.</div>
@@ -20799,6 +20872,11 @@ function myRender() {
     innerHTML = `
       <div class="p" style="font-weight:800; font-size:15px; color:var(--sb-light);">Men get assaulted too. And it's handled badly.</div>
       <div class="p">The idea that men can't be victims — or that they secretly wanted it — isn't just wrong. It's the reason most male survivors never say anything.</div>
+      <div class="p" style="color:var(--muted);">Theo Hutt is a survivor, advocate, and SafeBAE board member. In this video he shares his own experience — and what it's been like navigating a world that doesn't always believe men can be survivors.</div>
+      <div class="vcVideo">
+        <iframe src="https://www.youtube.com/embed/J50PuImLUV4" title="Theo Hutt — Male Survivors of Sexual Assault" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+      <div class="vcVideoCaption">▶ Theo Hutt, SafeBAE board member · Contains discussion of sexual assault — it's okay to take a break.</div>
       <div class="dsStepList">
         <div class="dsStep">
           <div class="dsStepNum">1</div>
